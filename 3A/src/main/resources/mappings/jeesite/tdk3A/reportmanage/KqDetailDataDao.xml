@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.tdk3A.reportmanage.dao.KqDetailDataDao">
+    
+	<sql id="kqOriginalityDataColumns">
+		a.kq_detail_id AS "kqDetailId",
+		a.username AS "username",
+		a.location AS "location",
+		a.machine_no AS "machineNo",
+		a.card_no AS "cardNo",
+		a.work_date AS "workDate",
+		a.status AS "status",
+		a.datafrom AS "datafrom",
+		a.inout_flag AS "inoutFlag",
+		a.oper_time AS "operTime",
+		a.oper_user AS "operUser",
+		a.oper_cause AS "operCause",
+		a.oper_mach AS "operMach",
+		a.sp_flag AS "spFlag",
+		a.sp_user AS "spUser",
+		a.sp_time AS "spTime",
+		a.curr_user AS "currUser",
+		a.latitude AS "latitude",
+		a.longitude AS "longitude",
+		u.no AS "user.no"
+	</sql>
+	
+    
+	<!-- <select id="get" resultType="KqOriginalityData">
+		SELECT 
+			<include refid="kqOriginalityDataColumns"/>
+		FROM kq_originality_data a
+		<include refid="kqOriginalityDataJoins"/>
+		WHERE a.kq_detail_id = #{id}
+	</select>
+	 -->
+	<select id="findList" resultType="KqOriginalityData">
+		SELECT 
+			<include refid="kqOriginalityDataColumns"/>
+		FROM kq_originality_data a
+		left join sys_user u on (a.kq_detail_id = u.kq_detail_id and u.del_flag = 0)
+		<where>
+			1=1
+			<if test="cardNo !=null and cardNo !=''">
+			   and a.card_no like '%${cardNo}%'
+			</if>
+			<if test="user !=null and user.no !=null and user.no !=''">
+			   and u.no like '%${user.no}%'
+			</if>
+			<if test="startTime !=null and startTime !=''">
+			   and a.work_date &gt; #{startTime}
+			</if>
+			<if test="endTime !=null and endTime !=''">
+			   and a.work_date &lt; #{endTime}
+			</if>
+		</where>
+		order by u.no
+		<!-- <choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose> -->
+	</select>
+	
+	<select id="findAllList" resultType="KqOriginalityData">
+		SELECT 
+			<include refid="kqOriginalityDataColumns"/>
+		FROM kq_originality_data a
+		left join sys_user u on (a.kq_detail_id = u.kq_detail_id and u.del_flag = 0)
+		<where>
+			1=1
+			<if test="cardNo !=null and cardNo !=''">
+			   and a.card_no like '%${cardNo}%'
+			</if>
+			<if test="user !=null and user.no !=null and user.no !=''">
+			   and u.no like '%${user.no}%'
+			</if>
+			<if test="startTime !=null and startTime !=''">
+			   and a.work_date &gt; #{startTime}
+			</if>
+			<if test="endTime !=null and endTime !=''">
+			   and a.work_date &lt; #{endTime}
+			</if>
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	
+</mapper>

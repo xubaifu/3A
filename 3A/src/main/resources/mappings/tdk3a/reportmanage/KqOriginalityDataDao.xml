@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.tdk3a.reportmanage.dao.KqOriginalityDataDao">
+    
+	<sql id="kqOriginalityDataColumns">
+		a.kq_detail_id AS "kqDetailId",
+		a.username AS "username",
+		a.location AS "location",
+		a.machine_no AS "machineNo",
+		a.card_no AS "cardNo",
+		a.work_date AS "workDate",
+		a.status AS "status",
+		a.datafrom AS "datafrom",
+		a.inout_flag AS "inoutFlag",
+		a.oper_time AS "operTime",
+		a.oper_user AS "operUser",
+		a.oper_cause AS "operCause",
+		a.oper_mach AS "operMach",
+		a.sp_flag AS "spFlag",
+		a.sp_user AS "spUser",
+		a.sp_time AS "spTime",
+		a.curr_user AS "currUser",
+		a.latitude AS "latitude",
+		a.longitude AS "longitude"
+	</sql>
+	
+	<sql id="kqOriginalityDataJoins">
+	</sql>
+    
+	<select id="get" resultType="KqOriginalityData">
+		SELECT 
+			<include refid="kqOriginalityDataColumns"/>
+		FROM kq_originality_data a
+		<include refid="kqOriginalityDataJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="KqOriginalityData">
+		SELECT 
+			<include refid="kqOriginalityDataColumns"/>
+		FROM kq_originality_data a
+		<include refid="kqOriginalityDataJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="KqOriginalityData">
+		SELECT 
+			<include refid="kqOriginalityDataColumns"/>
+		FROM kq_originality_data a
+		<include refid="kqOriginalityDataJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO kq_originality_data(
+			kq_detail_id,
+			username,
+			location,
+			machine_no,
+			card_no,
+			work_date,
+			status,
+			datafrom,
+			inout_flag,
+			oper_time,
+			oper_user,
+			oper_cause,
+			oper_mach,
+			sp_flag,
+			sp_user,
+			sp_time,
+			curr_user,
+			latitude,
+			longitude
+		) VALUES (
+			#{kqDetailId},
+			#{username},
+			#{location},
+			#{machineNo},
+			#{cardNo},
+			#{workDate},
+			#{status},
+			#{datafrom},
+			#{inoutFlag},
+			#{operTime},
+			#{operUser},
+			#{operCause},
+			#{operMach},
+			#{spFlag},
+			#{spUser},
+			#{spTime},
+			#{currUser},
+			#{latitude},
+			#{longitude}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE kq_originality_data SET 	
+			kq_detail_id = #{kqDetailId},
+			username = #{username},
+			location = #{location},
+			machine_no = #{machineNo},
+			card_no = #{cardNo},
+			work_date = #{workDate},
+			status = #{status},
+			datafrom = #{datafrom},
+			inout_flag = #{inoutFlag},
+			oper_time = #{operTime},
+			oper_user = #{operUser},
+			oper_cause = #{operCause},
+			oper_mach = #{operMach},
+			sp_flag = #{spFlag},
+			sp_user = #{spUser},
+			sp_time = #{spTime},
+			curr_user = #{currUser},
+			latitude = #{latitude},
+			longitude = #{longitude}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM kq_originality_data
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

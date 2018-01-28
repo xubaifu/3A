@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.tdk3A.temporarycard.dao.TemporaryCardDao">
+    
+	<select id="findList" resultType="TemporaryCardEntity">
+		select u.id, u.name, u.no, u.food_id, x.person_id, x.consume_time, c.cardno,x.id_key,x.remark
+		  from sys_user u
+		  left join xf_consume x
+		    on u.food_id = x.person_id
+		  left join sys_card c
+		    on u.no = c.userno
+		   and c.flag = 0
+		where u.food_id != 'null' 
+				<if test="cardno !=null and cardno !=''">
+						   and c.cardno = #{cardno}
+				</if>
+				<if test="startTime !=null and startTime !=''">
+					and x.consume_time &gt; #{startTime}
+				</if>
+				<if test="endTime !=null and endTime !=''">
+				  	and x.consume_time &lt; #{endTime}
+				</if>
+	</select>
+	<update id="addTemporaryCard">
+		update xf_consume set person_id = #{foodId},remark=#{personId} where id_key=#{idKey}
+	</update>
+	<select id="getFoodIdByNo" resultType="TemporaryCardEntity">
+		select food_id from sys_user u where no = #{no}
+	</select>
+</mapper>

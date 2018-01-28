@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.tdk3A.authorization.dao.AuthorizationDao">
+    
+	<select id="findList" resultType="AuthorizationEntity">
+		SELECT 
+			a.id as userId,
+		   a.company_id as companyid,
+	       a.office_id as officeId,
+	       t.name as officeName,
+	       a.login_name as loginName,
+	       a.no as userNo,
+	       a.name as userName,
+	       a.del_flag,
+	       a.door_id as doorId,
+	       a.food_id as foodId,
+	       c.cardno as cardNo,
+	       c.starttime as startTime,
+	       c.endTime as endTime,
+	       c.flag as cardStatus 
+			FROM sys_user a
+			left join SYS_OFFICE t on a.office_id = t.id
+			left join sys_card c on a.no = c.userno and c.flag = 0
+		WHERE a.del_flag=0
+		  and  a.office_id in(select dept.office_id from sys_role_office dept where dept.role_id in (${roleIds}))
+		<if test="userNo != null and userNo != ''">
+			and a.no like '%'||#{userNo}||'%'
+		</if>
+		<if test="cardNo != null and cardNo != ''">
+			and c.cardno like '%'||#{cardNo}||'%'
+		</if>
+		<if test="userName != null and userName != ''">
+			and a.name like '%'||#{userName}||'%'
+		</if>
+		<if test="officeId != null and officeId != ''">
+			and a.office_id = #{officeId}
+		</if>
+		<if test="userId != null and userId != ''">
+			and a.id = #{userId}
+		</if>
+		order by a.no
+	</select>
+	
+	<select id="getAuthorizationById" resultType="AuthorizationEntity">
+		SELECT 
+			a.id as userId,
+		   a.company_id as companyid,
+	       a.office_id as officeId,
+	       t.name as officeName,
+	       a.login_name as loginName,
+	       a.no as userNo,
+	       a.name as userName,
+	       a.del_flag,
+	       a.door_id as doorId,
+	       a.food_id as foodId,
+	       a.kq_id,
+			c.cardno as cardNo,
+	       c.starttime as startTime,
+	       c.endTime as endTime,
+	       c.flag as cardStatus 
+			FROM sys_user a
+			left join SYS_OFFICE t on a.office_id = t.id
+			left join sys_card c on a.no = c.userno  and c.flag = 0
+		WHERE a.del_flag=0
+			and a.id = #{id}
+	</select>
+	
+	<select id="getDoorByDept" resultType="TBControllerEntity">
+		select 
+		  c.f_controllerid,c.f_controllerno,d.f_doorid,d.f_doorno,c.f_ip,c.f_controllersn,d.f_doorname from 
+		  
+		   (select * from t_b_controller where f_controllerid in (select con_id from DEPT_CON where DEPT_ID=#{dept_id})) c left join t_b_door d on c.f_controllerid = d.f_controllerid
+		   order by d.f_doorname
+	</select>
+	<select id="getDoorByUserAuthorzation" resultType="TBControllerEntity">
+		select *
+		  from t_d_privilege p
+		  left join sys_user u
+		    on p.f_consumerid = u.door_id
+		  left join (select 
+		  c.f_controllerid,c.f_controllerno,d.f_doorid,d.f_doorno,c.f_ip,c.f_controllersn,d.f_doorname
+		  
+		   from t_b_controller c left join t_b_door d on c.f_controllerid = d.f_controllerid)  c 
+		    on p.f_controllerid = c.f_controllerid
+		 where u.no = #{userNo}
+	</select>
+	
+	<select id="getAllDoor" resultType="TBControllerEntity">
+		select 
+			* 
+		from t_b_controller c left join t_b_door d on c.f_controllerid = d.f_controllerid 
+		 where  c.f_controllerid in (select con.con_id from sys_role_con con where con.role_id in (${roleIds}))
+		 order by d.f_doorname
+		<!-- select *
+		  from t_d_privilege p
+		  left join sys_user u
+		    on p.f_consumerid = u.door_id
+		  left join (select 
+		  c.f_controllerid,c.f_controllerno,d.f_doorid,d.f_doorno,c.f_ip,c.f_controllersn,d.f_doorname
+		  
+		   from t_b_controller c left join t_b_door d on c.f_controllerid = d.f_controllerid)  c 
+		    on p.f_controllerid = c.f_controllerid
+		 where u.no = #{userNo} -->
+			
+		<!-- select f_controllerid,
+		       f_controllerno,
+		       f_controllersn,
+		       f_enabled,
+		       f_ip,
+		       f_port,
+		       f_note,
+		       f_doornames,
+		       f_zoneid,
+		       f_antiback,
+		       f_interlock,
+		       f_morecards_goinout,
+		       f_doorinvalidopen,
+		       f_dooropentoolong,
+		       f_forcewarn,
+		       f_invalidcardwarn,
+		       f_peripheralcontrol,
+		       f_lastdeladddatetime,
+		       f_lastdeladdconsuemrstotal,
+		       f_lastdeladdanduploaddatetime,
+		       f_lastdeladdanduploadconsuemrs,
+		       f_lastconsoleuploaddatetime,
+		       f_lastconsoleuploadconsuemrsto,
+		       f_lastconsoleuploadprivilege,
+		       f_lastconsoleuploadvalidprivil
+		  from t_b_controller  -->
+
+	</select>
+	<insert id="addAttendanceFun">
+		insert into [bsv5].[dbo].[dt_user]
+		  (USER_SERIAL,
+		   user_lname,
+		   USER_DEP,
+		   USER_NO,
+		   USER_DEPNAME,
+		   dep_no,
+		   user_card,
+		   user_fname,
+		   user_type,
+		   user_finger,
+		   user_level,
+		   user_photo,
+		   user_duty,
+		   user_workday)
+		values
+		  ('${kqId}',
+		   '${userName}',
+		   '10000',
+		   '${userNo}',
+		   'TDK大连电子有限公司',
+		   '001',
+		   '${cardNo}',
+		   '',
+		   '0',
+		   '0000000000',
+		   '0',
+		   '0',
+		   '',
+		   '')
+	</insert>
+	<update id="updateAttendanceFun">
+		update [bsv5].[dbo].[dt_user] set 
+		  USER_SERIAL = '${kqId}',
+		   user_lname = '${userName}',
+		   USER_DEP = '10000',
+		   USER_DEPNAME = 'TDK大连电子有限公司',
+		   dep_no = '001',
+		   user_card = '${cardNo}',
+		   user_fname = '',
+		  <if test="userType != null and userType != ''">
+			user_type = '${userType}',
+		  </if>
+		   <if test="userType == null or userType == ''">
+			user_type = '0',
+		  </if>
+		   user_finger = '0000000000',
+		   user_level = '0',
+		   user_photo = '0',
+		   user_duty = '',
+		   user_workday = ''
+		where  USER_NO = '${userNo}'
+		
+	</update>
+	<select id="getAttendanceByUserNo" resultType="AuthorizationEntity">
+		SELECT count(0) as num from [bsv5].[dbo].[dt_user] where USER_NO = '${userNo}' 
+	</select>
+	
+	<select id="getAttendanceController" resultType="AttendanceEntity">
+		select * from st_device where del_flag = '0'
+	</select>
+	
+	<select id="getUserCardCount" resultType="AuthorizationEntity">
+		select count(0) as num from sys_card where userno = ${userNo} 
+	</select>
+	
+	<insert id="addUserCard">
+		insert into sys_card
+		  (id, cardno, userno, starttime, endtime, flag)
+		values
+		  (sys_guid(), '${cardNo}', '${userNo}', #{startTime}, #{endTime}, '0')
+  	</insert>
+  
+  	<select id="getUserCard" resultType="AuthorizationEntity">
+		select cardno AS cardNo from sys_card where userno = ${userNo} and flag = 0
+	</select>
+	
+	<update id="updateUserCard">
+		update sys_card
+		   set 
+		       flag = '1'
+		 where cardno = ${oldCardNo}
+	</update>
+	<update id="updateDoorId">
+		update sys_user set door_id = (select nvl(max(to_number(door_id)),0)+1 from sys_user) where no = #{userNo}
+	</update>
+	
+	<insert id="addPrivilege">
+		insert into [AccessData].[dbo].[t_d_privilege]
+		  (f_doorid, f_controlsegid, f_consumerid, f_controllerid, f_doorno)
+		values
+		  (
+		  '${fDoorid}', 
+		  '1', 
+		  '${doorId}', 
+		  '${fControllerid}', 
+		  '${fDoorno}')
+  	</insert>
+  	
+  	<select id="getPrivilegeFromEHR" resultType="AuthorizationEntity">
+		select * from [AccessData].[dbo].[t_d_privilege]
+	</select>
+  	<insert id="addPrivilegeTo3A">
+		insert into t_d_privilege
+		  (f_privilegerecid, f_doorid, f_controlsegid, f_consumerid, f_controllerid, f_doorno)
+		values
+		  (#{fPrivilegerecid}, #{fDoorid}, #{fControlsegid}, #{fConsumerid}, #{fControllerid}, #{fDoorno})
+  	</insert>
+  	<update id="updatePrivilegeTo3A">
+		update t_d_privilege
+		   set f_privilegerecid =#{fPrivilegerecid},
+		       f_doorid = #{fDoorid},
+		       f_controlsegid = #{fControlsegid},
+		       f_consumerid = #{fConsumerid},
+		       f_controllerid = #{fControllerid},
+		       f_doorno = #{fDoorno}
+		 where f_privilegerecid =#{fPrivilegerecid}
+	</update>
+	<select id="getPrivilegeById" resultType="AuthorizationEntity">
+		select count(0) as num from t_d_privilege where f_privilegerecid =#{fPrivilegerecid}
+	</select>
+	
+	<select id="getPrivilegeByDoorId" resultType="AuthorizationEntity">
+		select * from t_d_privilege t 
+		left join t_b_controller c on t.f_controllerid = c.f_controllerid
+		where t.f_consumerid = #{doorId}
+	</select>
+	
+	<delete id="deletePrivilegeTo3A">
+		delete t_d_privilege t
+		where t.f_consumerid = #{doorId}
+	</delete>
+	<delete id="deletePrivilegeToEHR">
+		delete [AccessData].[dbo].[t_d_privilege]
+		where f_consumerid = #{doorId}
+	</delete>
+	
+	
+	
+	<select id="findSTPersonById" resultType="AuthorizationEntity">
+		select count(0) as num from [STCard_Enp].[dbo].[ST_Person] where Person_ID = #{foodId}
+	</select>
+	<select id="findSTCardById" resultType="AuthorizationEntity">
+		select count(0) as num from [STCard_Enp].[dbo].[ST_Card] where Person_ID = #{foodId}
+	</select>
+	<insert id="addSTPerson">
+		insert into [STCard_Enp].[dbo].[ST_Person]
+		(Person_ID,Dept_ID,Card_No,Person_No,Person_Name,Person_Type,Is_Marry,Is_Del)
+		values
+		(#{foodId},#{typeNo},#{cardNo},#{userNo},#{userName},'职工',0,0)
+  	</insert> 
+  	<insert id="addSTCard">
+		insert into [STCard_Enp].[dbo].[ST_Card]
+		(Person_ID,Type_No,Card_Password,Card_NewDate,Card_ValidDate,Card_Foregift,Card_Charge,Card_Balance,Card_SmallBalance,Card_State,User_No,Subsidy_fund,Remark,Update_Time,IC_Balance,Subsidy_Flag)
+		values
+		(#{foodId},#{typeNo},'7AACF26A44089FEB',GETDATE(),GETDATE(),'0.00','0.00','9999.00','0.00','0','Admin','0.00',null,GETDATE(),'9999.00','0')
+  	</insert>
+  	<update id="updateSTPerson">
+		update [STCard_Enp].[dbo].[ST_Person] 
+		set 
+		Dept_ID = #{typeNo},
+		Card_No = #{cardNo},
+		Person_No = #{userNo},
+		Person_Name = #{userName}
+		where Person_ID = #{foodId}
+  	</update>
+  	<update id="updateSTCard">
+		update [STCard_Enp].[dbo].[ST_Card] 
+		set 
+		Type_No = #{typeNo}
+		where Person_ID = #{foodId}
+  	</update>
+</mapper>

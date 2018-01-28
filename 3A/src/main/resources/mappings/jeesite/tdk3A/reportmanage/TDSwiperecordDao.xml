@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.tdk3A.reportmanage.dao.TDSwiperecordDao">
+    
+	<sql id="tDSwiperecordColumns">
+		a.f_recid AS "fRecid",
+		a.f_readdate AS "fReaddate",
+		a.f_cardno AS "fCardno",
+		a.f_consumerid AS "fConsumerid",
+		a.f_character AS "fCharacter",
+		a.f_inout AS "fInout",
+		a.f_status AS "fStatus",
+		a.f_recoption AS "fRecoption",
+		a.f_controllersn AS "fControllersn",
+		a.f_readerid AS "fReaderid",
+		a.f_readerno AS "fReaderno",
+		a.f_recordflashloc AS "fRecordflashloc",
+		a.f_recordall AS "fRecordall",
+		a.f_modified AS "fModified"
+	</sql>
+	
+	<sql id="tDSwiperecordJoins">
+	</sql>
+    
+	<select id="get" resultType="TDSwiperecord">
+		SELECT 
+			<include refid="tDSwiperecordColumns"/>
+		FROM t_d_swiperecord a
+		<include refid="tDSwiperecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findListFromEhr" resultType="TDSwiperecord">
+		select * from [STCard_Enp].[dbo].[t_d_SwipeRecord] where f_readdate &gt; DATEADD(day, -1, GETDATE()) 
+	</select>
+	
+	<select id="findList" resultType="TDSwiperecord">
+		<!-- SELECT 
+			<include refid="tDSwiperecordColumns"/>
+		FROM t_d_swiperecord a
+		<include refid="tDSwiperecordJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose> -->
+		select u.name,u.no,c.f_doornames,s.f_readdate from t_d_SwipeRecord s
+		left join sys_user u on u.door_id = s.f_Consumerid
+		left join t_b_Controller c on c.f_controllersn = s.f_controllersn
+		where 1=1 
+			<if test="no !=null and no !=''">
+			   and u.no = #{no}
+			</if>
+			<if test="name !=null and name !=''">
+			   and u.name like '%${name}%'
+			</if>
+			<if test="startTime !=null and startTime !=''">
+			   	and s.f_readdate &gt; #{startTime}
+			</if>
+			<if test="endTime !=null and endTime !=''">
+			  	and s.f_readdate &lt; #{endTime}
+			</if>
+		
+	</select>
+	
+	<select id="findAllList" resultType="TDSwiperecord">
+		select u.name,u.no,c.f_doornames,s.f_readdate from t_d_SwipeRecord s
+		left join sys_user u on u.door_id = s.f_Consumerid
+		left join t_b_Controller c on c.f_controllersn = s.f_controllersn
+		where 1=1 
+			<if test="no !=null and no !=''">
+			   and u.no = #{no}
+			</if>
+			<if test="name !=null and name !=''">
+			   and u.name like '%${name}%'
+			</if>
+			<if test="startTime !=null and startTime !=''">
+			   and s.f_readdate &gt; #{startTime}
+			</if>
+			<if test="endTime !=null and endTime !=''">
+			  and s.f_readdate &lt; #{endTime}
+			</if>
+		<!-- SELECT 
+			<include refid="tDSwiperecordColumns"/>
+		FROM t_d_swiperecord a
+		<include refid="tDSwiperecordJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose> -->
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO t_d_swiperecord(
+			f_recid,
+			f_readdate,
+			f_cardno,
+			f_consumerid,
+			f_character,
+			f_inout,
+			f_status,
+			f_recoption,
+			f_controllersn,
+			f_readerid,
+			f_readerno,
+			f_recordflashloc,
+			f_recordall,
+			f_modified
+		) VALUES (
+			#{fRecid},
+			#{fReaddate},
+			#{fCardno},
+			#{fConsumerid},
+			#{fCharacter},
+			#{fInout},
+			#{fStatus},
+			#{fRecoption},
+			#{fControllersn},
+			#{fReaderid},
+			#{fReaderno},
+			#{fRecordflashloc},
+			#{fRecordall},
+			#{fModified}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE t_d_swiperecord SET 	
+			f_recid = #{fRecid},
+			f_readdate = #{fReaddate},
+			f_cardno = #{fCardno},
+			f_consumerid = #{fConsumerid},
+			f_character = #{fCharacter},
+			f_inout = #{fInout},
+			f_status = #{fStatus},
+			f_recoption = #{fRecoption},
+			f_controllersn = #{fControllersn},
+			f_readerid = #{fReaderid},
+			f_readerno = #{fReaderno},
+			f_recordflashloc = #{fRecordflashloc},
+			f_recordall = #{fRecordall},
+			f_modified = #{fModified}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM t_d_swiperecord
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

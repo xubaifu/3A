@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.tdk3A.accessaontrol.dao.AccessControlDao">
+    <select id="getAllDoorByArea" resultType="AccessControlEntity">
+		select 
+			* 
+		from t_b_controller c left join t_b_door d on c.f_controllerid = d.f_controllerid
+		where  c.f_controllerid in (select con.con_id from sys_role_con con where con.role_id in (${roleIds}))
+		order  by d.f_doorname
+	</select>
+	<insert id="insertIntoDeptCon">
+		insert into dept_con
+		  (dept_id, con_id)
+		values
+		  (#{deptId}, #{conId})
+  	</insert>
+  	<delete id="deleteDeptConByOfficeId">
+  		delete dept_con where dept_id = #{deptId}
+  	</delete>
+  	
+  	 <select id="getAllDoorAreadySelect" resultType="AccessControlEntity">
+		select * from dept_con t left join 
+			(select  c.f_controllerid,d.f_doorname
+		    	from t_b_controller c left join t_b_door d on c.f_controllerid = d.f_controllerid
+		    ) t1
+		    on t.con_id = t1.f_controllerid
+		where t.dept_id = #{officeId}
+		order by t1.f_doorname
+	</select>
+	
+	<select id="findList" resultType="AccessControlEntity">
+		<!-- select * from dept_con c left join sys_office o on o.id = c.dept_id -->
+		select
+			t.dept_id as deptId,
+			wm_concat(t.con_id) as conId,
+			wm_concat(d.f_doorname) as fDoorName,
+			o.name as name,
+			t.dept_id as id,
+			o.code as code
+		from dept_con t 
+		left join sys_office o on o.id = t.dept_id
+		left join t_b_door d on d.f_controllerid = t.con_id 
+		group by t.dept_id,o.name,o.code
+		order by o.code
+	</select>
+  	
+</mapper>

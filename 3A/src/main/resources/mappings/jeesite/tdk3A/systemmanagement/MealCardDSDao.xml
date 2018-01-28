@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.tdk3A.systemmanagement.dao.MealCardDSDao">
+    
+	<select id="getAllMealCard" resultType="MealCardDS">
+		<!-- select * from [STCard_Enp].[dbo].[XF_ConsumeTemp]当时不知道为啥这么写??? -->
+		select * from [STCard_Enp].[dbo].[XF_Consume] where consume_time &gt; DATEADD(day, -1, GETDATE()) 
+	</select>
+	<select id="getMealCardById" resultType="MealCardDS">
+		select count(0) as num from XF_Consume where id_key = #{idKey}
+	</select>
+	<insert id="addMealCard">
+		INSERT INTO xf_consume(
+			id_key,
+			person_id,
+			system_no,
+			consume_mode,
+			consume_time,
+			consume_fund,
+			before_fund,
+			consume_copy,
+			consume_timelen,
+			consume_capacity,
+			repast_no,
+			ware_id,
+			moc_no,
+			com_no,
+			card_balance,
+			db_balance,
+			card_smallaccount,
+			data_type,
+			remark,
+			download_time
+		) VALUES (
+			#{idKey},
+			#{personId},
+			#{systemNo},
+			#{consumeMode},
+			#{consumeTime},
+			#{consumeFund},
+			#{beforeFund},
+			#{consumeCopy},
+			#{consumeTimelen},
+			#{consumeCapacity},
+			#{repastNo},
+			#{wareId},
+			#{mocNo},
+			#{comNo},
+			#{cardBalance},
+			#{dbBalance},
+			#{cardSmallaccount},
+			#{dataType},
+			#{remark},
+			#{downloadTime}
+		)
+	</insert>
+	
+	<update id="updateMealCard">
+		UPDATE xf_consume SET 	
+			person_id = #{personId},
+			system_no = #{systemNo},
+			consume_mode = #{consumeMode},
+			consume_time = #{consumeTime},
+			consume_fund = #{consumeFund},
+			before_fund = #{beforeFund},
+			consume_copy = #{consumeCopy},
+			consume_timelen = #{consumeTimelen},
+			consume_capacity = #{consumeCapacity},
+			repast_no = #{repastNo},
+			ware_id = #{wareId},
+			moc_no = #{mocNo},
+			com_no = #{comNo},
+			card_balance = #{cardBalance},
+			db_balance = #{dbBalance},
+			card_smallaccount = #{cardSmallaccount},
+			data_type = #{dataType},
+			remark = #{remark},
+			download_time = #{downloadTime}
+		WHERE id_key = #{idKey}
+	</update>
+	
+	<update id="deleteMealCard">
+		DELETE FROM xf_consume
+		WHERE id_key = #{idKey}
+	</update>
+	
+</mapper>

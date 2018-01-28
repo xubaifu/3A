@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.tdk3A.systemmanagement.dao.AccessControlDSDao">
+    
+	<select id="getAllController" resultType="AccessControlDSEntity">
+		select 
+			*
+		from [AccessData].[dbo].[t_b_Controller]
+	</select>
+	
+	<select id="getControllerById" resultType="AccessControlDSEntity">
+		select count(0) as num from t_b_Controller where f_controllerID = #{fControllerid}
+	</select>
+	
+	
+	<insert id="addController">
+		insert into t_b_controller
+		  (f_controllerid,
+		   f_controllerno,
+		   f_controllersn,
+		   f_enabled,
+		   f_ip,
+		   f_port,
+		   f_note,
+		   f_doornames,
+		   f_zoneid,
+		   f_antiback,
+		   f_interlock,
+		   f_morecards_goinout,
+		   f_doorinvalidopen,
+		   f_dooropentoolong,
+		   f_forcewarn,
+		   f_invalidcardwarn,
+		   f_peripheralcontrol,
+		   f_lastdeladddatetime,
+		   f_lastdeladdconsuemrstotal,
+		   f_lastdeladdanduploaddatetime,
+		   f_lastdeladdanduploadconsuemrs,
+		   f_lastconsoleuploaddatetime,
+		   f_lastconsoleuploadconsuemrsto,
+		   f_lastconsoleuploadprivilege,
+		   f_lastconsoleuploadvalidprivil,
+		   UPDATE_DATE,
+		   DEL_FLAG)
+		values
+		  ('${fControllerid}',
+		   '${fControllerno}',
+		   '${fControllersn}',
+		   '${fEnabled}',
+		   '${fIp}',
+		   '${fPort}',
+		   '${fNote}',
+		   '${fDoornames}',
+		   '0',
+		   '${fAntiback}',
+		   '${fInterlock}',
+		   '${fMorecardsGoinout}',
+		   '${fDoorinvalidopen}',
+		   '${fDooropentoolong}',
+		   '${fForcewarn}',
+		   '${fInvalidcardwarn}',
+		   '${fPeripheralcontrol}',
+		   '${fLastdeladddatetime}',
+		   '${fLastdeladdconsuemrstotal}',
+		   '${fLastdeladdanduploaddatetime}',
+		   '1',
+		   '${fLastconsoleuploaddatetime}',
+		   '0',
+		   '${fLastconsoleuploadprivilege}',
+		   '0',
+		   sysdate,
+		   '0')
+
+	</insert>
+	
+	<update id="updateController">
+		update t_b_controller
+		   set
+		       f_controllerno                 = '${fControllerno}',
+		       f_controllersn                 = '${fControllersn}',
+		       f_enabled                      = '${fEnabled}',
+		       f_ip                           = '${fIp}',
+		       f_port                         = '${fPort}',
+		       f_note                         = '${fNote}',
+		       f_doornames                    = '${fDoornames}',
+		       f_zoneid                       = '0',
+		       f_antiback                     = '${fAntiback}',
+		       f_interlock                    = '${fInterlock}',
+		       f_morecards_goinout            = '${fMorecardsGoinout}',
+		       f_doorinvalidopen              = '${fDoorinvalidopen}',
+		       f_dooropentoolong              = '${fDooropentoolong}',
+		       f_forcewarn                    = '${fForcewarn}',
+		       f_invalidcardwarn              = '${fInvalidcardwarn}',
+		       f_peripheralcontrol            = '${fPeripheralcontrol}',
+		       f_lastdeladddatetime           = '${fLastdeladddatetime}',
+		       f_lastdeladdconsuemrstotal     = '${fLastdeladdconsuemrstotal}',
+		       f_lastdeladdanduploaddatetime  = '${fLastdeladdanduploaddatetime}',
+		       f_lastdeladdanduploadconsuemrs = '1',
+		       f_lastconsoleuploaddatetime    = '${fLastconsoleuploaddatetime}',
+		       f_lastconsoleuploadconsuemrsto = '0',
+		       f_lastconsoleuploadprivilege   = '${fLastconsoleuploadprivilege}',
+		       f_lastconsoleuploadvalidprivil = '0',
+		       UPDATE_DATE                    =  sysdate,
+		   	   DEL_FLAG                       = '0'
+		    where f_controllerid= '${fControllerid}'
+		
+	</update>
+	
+	<update id="deleteController">
+		UPDATE t_b_controller SET 	
+			del_flag = '1'
+		WHERE f_controllerid= '${fControllerid}'
+	</update>
+	
+	<select id="getAllControllerByUpdate" resultType="AccessControlDSEntity">
+		select * from t_b_controller where update_date &lt; to_date(to_char(sysdate,'yyyy-mm-dd'),'yyyy-mm-dd')
+	</select>
+	
+</mapper>

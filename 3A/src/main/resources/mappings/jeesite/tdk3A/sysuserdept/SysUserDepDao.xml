@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.tdk3A.sysuserdept.dao.SysUserDepDao">
+    
+	<sql id="sysUserDepColumns">
+		a.id AS "id",
+		a.user_id AS "user.id",
+		a.dept_id AS "deptId",
+		a.create_time AS "createTime",
+		a.update_time AS "updateTime",
+		a.del_flag AS "delFlag",
+		u2.name AS "user.name"
+	</sql>
+	
+	<sql id="sysUserDepJoins">
+		LEFT JOIN sys_user u2 ON u2.id = a.user_id
+	</sql>
+    
+	<select id="get" resultType="SysUserDep">
+		SELECT 
+			<include refid="sysUserDepColumns"/>
+		FROM sys_user_dep a
+		<include refid="sysUserDepJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SysUserDep">
+		SELECT 
+			<include refid="sysUserDepColumns"/>
+		FROM sys_user_dep a 
+		  LEFT JOIN sys_user u2 ON u2.id = a.user_id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			  and u2.id = #{user.id}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SysUserDep">
+		SELECT 
+			<include refid="sysUserDepColumns"/>
+		FROM sys_user_dep a
+		<include refid="sysUserDepJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sys_user_dep(
+			id,
+			user_id,
+			dept_id,
+			create_time,
+			update_time,
+			del_flag
+		) VALUES (
+			#{id},
+			#{user.id},
+			#{deptId},
+			#{createTime},
+			#{updateTime},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_user_dep SET 	
+			user_id = #{user.id},
+			dept_id = #{deptId},
+			create_time = #{createTime},
+			update_time = #{updateTime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE sys_user_dep SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

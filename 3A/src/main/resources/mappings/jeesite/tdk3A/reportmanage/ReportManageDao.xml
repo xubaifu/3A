@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.tdk3A.reportmanage.dao.ReportManageDao">
+    
+    <select id="findList" resultType="ReportManage">
+	    select *
+		  from (select u1.office_id, u1.name, u1.food_id, o.name as officeName,u1.no
+		          from sys_user u1
+		          left join sys_office o on u1.office_id = o.id
+		         <!-- where office_id = '011'
+		           and no = ''
+		           and name like '%%' -->
+		           <where>
+						u1.id !='1'
+						<if test="officeId !=null and officeId !=''">
+						   and u1.office_id = #{officeId}
+						</if>
+						<if test="no !=null and no !=''">
+						   and u1.no = #{no}
+						</if>
+						<if test="name !=null and name !=''">
+						   and u1.name like '%${name}%'
+						</if>
+					</where>
+		           
+		           ) u
+		  left join xf_consume xf
+		    on u.food_id = xf.Person_ID
+	</select>
+	<!-- 第一次个人餐费统计sql -->
+	<select id="findPersonListTest" resultType="ReportManage">
+	    SELECT count(ID_KEY) as times,
+	       sys_user.name as name,
+	       sys_user.no as no,
+	       Consume_Time,
+	       Repast_No,
+	       Person_ID,
+	       (case Repast_No
+	         when '003' then
+	          0.5
+	         when '002' then
+	          5
+	       end) as subsidy,
+	       sum(Consume_Fund) as allmoney,
+	       case
+	         when (sum(Consume_Fund) - (case Repast_No
+	                when '003' then
+	                 2
+	                when '002' then
+	                 5
+	              end)) &lt; 0 then
+	          0
+	         else
+	          (sum(Consume_Fund) - (case Repast_No
+	            when '003' then
+	             2
+	            when '002' then
+	             5
+	          end))
+	       end as person
+	  FROM XF_Consume
+	  left join sys_user
+	    on (sys_user.food_id = XF_Consume.Person_Id  and sys_user.id !='1')
+	    
+	    <where>
+			1=1
+			<if test="officeId !=null and officeId !=''">
+			   and sys_user.office_id = #{officeId}
+			</if>
+			<if test="no !=null and no !=''">
+			   and sys_user.no = #{no}
+			</if>
+			<if test="name !=null and name !=''">
+			   and sys_user.name like '%${name}%'
+			</if>
+		</where>
+	    
+	    
+	 GROUP BY Consume_Time, Repast_No, Person_ID，sys_user.name, sys_user.no
+	 order by  sys_user.no
+	 </select>
+	 <!-- 第二次个人餐费统计sql -->
+	 <select id="findPersonList" resultType="ReportManage">
+	     select *
+		      from (select sys_user.office_id, sys_user.name, sys_user.food_id,o.name as officeName,sys_user.no
+		              from sys_user
+		              left join sys_office o on sys_user.office_id = o.id
+		             where food_id is not null  and sys_user.id !='1'
+		             ) u
+		  LEFT JOIN (SELECT Consume_Time, <!-- AS day_time, -->
+		                    (case Repast_No
+		                      when '001' then
+		                       '早餐'
+		                      when '002' then
+		                       '午餐'
+		                      when '003' then
+		                       '晚餐'
+		                      when '004' then
+		                       '夜餐1'
+		                      when '005' then
+		                       '夜餐2'
+		                      else
+		                       '其他'
+		                    end) as mealType,
+		                    Person_ID,
+		                    count(ID_KEY) as times,
+		                    sum(Consume_Fund) as allmoney,
+		                    (case Repast_No
+		                      when '001' then
+		                       0.5
+		                      when '002' then
+		                       1.5
+		                      when '003' then
+		                       1.5
+		                      when '004' then
+		                       1.5
+		                      when '005' then
+		                       1.5
+		                      else
+		                       0
+		                    end) as subsidy,
+		                    case
+		                      when (sum(Consume_Fund) - (case Repast_No
+		                             when '001' then
+		                              0.5
+		                             when '002' then
+		                              1.5
+		                             when '003' then
+		                              1.5
+		                             when '004' then
+		                              1.5
+		                             when '005' then
+		                              1.5
+		                             else
+		                              0
+		                           end)) &lt; 0 then
+		                       0
+		                      else
+		                       (sum(Consume_Fund) - (case Repast_No
+		                         when '001' then
+		                          0.5
+		                         when '002' then
+		                          1.5
+		                         when '003' then
+		                          1.5
+		                         when '004' then
+		                          1.5
+		                         when '005' then
+		                          1.5
+		                         else
+		                          0
+		                       end))
+		                    end as person
+		               FROM XF_Consume
+		              GROUP BY Consume_Time, Repast_No, Person_ID
+		             <!-- having Consume_Time &lt; to_date('2017-07-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+		             	and Consume_Time &gt; to_date('2017-01-25 00:00:00', 'yyyy-mm-dd hh24:mi:ss') -->
+		             <!-- 	<if test="startTime !=null and startTime !='' (and endTime ==null or endTime =='')">
+						   	having Consume_Time &gt; #{startTime}
+						</if>
+						<if test="endTime !=null and endTime !='' and (startTime ==null or startTime =='' )">
+						  	having Consume_Time &lt; #{endTime}
+						</if> -->
+						<if test="endTime !=null and endTime !='' and startTime !=null and startTime !=''">
+						  	having Consume_Time &lt; #{endTime} 
+		             		and Consume_Time &gt; #{startTime}
+						</if>
+						
+		            ) xf
+		    on u.food_id = xf.Person_ID
+			    where 1=1
+			    	<if test="officeId !=null and officeId !=''">
+					   and u.office_id = #{officeId}
+					</if>
+			    	<if test="no !=null and no !=''">
+					   and u.no = #{no}
+					</if>
+					<if test="name !=null and name !=''">
+					   and u.name like '%${name}%'
+					</if>
+
+	 </select>
+	 
+	 <!-- 统计求和 -->
+	 <select id="sum" resultType="ReportManage">
+	     select 
+	      	mealtype,sum(aa.times) as times, sum(aa.allmoney) as allmoney, sum(aa.subsidy) as subsidy, sum(aa.person) as person,aa.Repast_No
+	     from
+	     (select *
+		      from (select sys_user.office_id, sys_user.name, sys_user.food_id,o.name as officeName,sys_user.no
+		              from sys_user
+		              left join sys_office o on sys_user.office_id = o.id
+		             where food_id is not null and sys_user.id !='1'
+		             ) u
+		  LEFT JOIN (SELECT Consume_Time, <!-- AS day_time, -->
+		  					 Repast_No,
+		                    (case Repast_No
+		                      when '001' then
+		                       '早餐'
+		                      when '002' then
+		                       '午餐'
+		                      when '003' then
+		                       '晚餐'
+		                      when '004' then
+		                       '夜餐1'
+		                      when '005' then
+		                       '夜餐2'
+		                      else
+		                       '其他'
+		                    end) as mealType,
+		                    Person_ID,
+		                    count(ID_KEY) as times,
+		                    sum(Consume_Fund) as allmoney,
+		                    (case Repast_No
+		                      when '001' then
+		                       0.5
+		                      when '002' then
+		                       1.5
+		                      when '003' then
+		                       1.5
+		                      when '004' then
+		                       1.5
+		                      when '005' then
+		                       1.5
+		                      else
+		                       0
+		                    end) as subsidy,
+		                    case
+		                      when (sum(Consume_Fund) - (case Repast_No
+		                             when '001' then
+		                              0.5
+		                             when '002' then
+		                              1.5
+		                             when '003' then
+		                              1.5
+		                             when '004' then
+		                              1.5
+		                             when '005' then
+		                              1.5
+		                             else
+		                              0
+		                           end)) &lt; 0 then
+		                       0
+		                      else
+		                       (sum(Consume_Fund) - (case Repast_No
+		                         when '001' then
+		                          0.5
+		                         when '002' then
+		                          1.5
+		                         when '003' then
+		                          1.5
+		                         when '004' then
+		                          1.5
+		                         when '005' then
+		                          1.5
+		                         else
+		                          0
+		                       end))
+		                    end as person
+		               FROM XF_Consume
+		              GROUP BY Consume_Time, Repast_No, Person_ID
+						<if test="endTime !=null and endTime !='' and startTime !=null and startTime !=''">
+						  	having Consume_Time &lt; #{endTime} 
+		             		and Consume_Time &gt; #{startTime}
+						</if>
+						
+		            ) xf
+		    on u.food_id = xf.Person_ID
+			    where 1=1
+			    	<if test="officeId !=null and officeId !=''">
+					   and u.office_id = #{officeId}
+					</if>
+			    	<if test="no !=null and no !=''">
+					   and u.no = #{no}
+					</if>
+					<if test="name !=null and name !=''">
+					   and u.name like '%${name}%'
+					</if>
+		) aa group by aa.mealtype,aa.Repast_No order by aa.Repast_No
+	 </select>
+    
+	
+</mapper>

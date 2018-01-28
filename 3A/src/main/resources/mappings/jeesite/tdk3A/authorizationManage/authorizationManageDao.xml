@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.tdk3A.authorizationManage.dao.AuthorizationManageDao">
+	<select id="getUserByOffice" resultType="AuthorizationManageEntity">
+		<!-- SELECT 
+			*
+		FROM sys_user a
+		WHERE a.office_id = #{officeId} -->
+		 select * from sys_user u 
+		 	left join sys_office o on u.office_id = o.id
+  			left join sys_card c on u.no = c.userno  and c.flag = 0
+  		where 1=1 and u.del_flag = 0
+  			<if test="officeId != null and officeId != ''">
+				and (o.parent_ids like '%'||#{officeId}||','||'%' or o.id = #{officeId})
+			</if>
+			order by u.no
+	</select>
+	
+	<select id="getAttendanceController" resultType="AttendanceEntity">
+		select * from st_device where del_flag = '0'
+	</select>
+</mapper>

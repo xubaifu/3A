@@ -1,0 +1,98 @@
+@charset "utf-8";
+
+.two_way_list_selector {
+	width: 900px;
+	height: 250px;
+	margin-left: 15%;
+}
+
+.two_way_list_selector .select_l,.two_way_list_selector .select_r {
+	width: 350px;
+	height: 250px;
+	float: left;
+	border: 1px solid #CCC;
+}
+
+.two_way_list_selector .select_l .option {
+	height: 29px;
+	line-height: 29px;
+	border-bottom: 1px solid #ddd;
+}
+
+.two_way_list_selector .select_l .option .l {
+	width: 30%;
+	float: left;
+	text-indent: 10px;
+}
+.two_way_list_selector .select_r .option {
+	height: 29px;
+	line-height: 29px;
+	border-bottom: 1px solid #ddd;
+}
+.two_way_list_selector .select_r .option .r {
+	width: 30%;
+	float: left;
+	text-indent: 10px;
+}
+.two_way_list_selector .select_l .option .r {
+	width: 70%;
+	float: right;
+	text-align: center;
+}
+
+.two_way_list_selector .select_l .select_a,.two_way_list_selector .select_r .select_b
+	{
+	width: 100%;
+	height: 220px;
+	overflow: auto;
+}
+/* .two_way_list_selector .select_r .option .r {
+width: 100%;
+height: 220px;
+overflow: auto;
+} */
+.two_way_list_selector .select_r .select_b {
+	height: 220px;
+}
+
+.two_way_list_selector .select_l .select_a div,.two_way_list_selector .select_r .select_b div
+	{
+	padding: 10px;
+	height: 6px;
+	line-height: 6px;
+	border-bottom: 1px solid #ddd;
+	background: #FFF;
+}
+
+.two_way_list_selector .select_l .select_a div:last-child,.two_way_list_selector .select_r .select_b div:last-child
+	{
+	border-bottom: none;
+}
+
+.two_way_list_selector .select_btn {
+	width: 10%;
+	height: 250px;
+	float: left;
+	display: table;
+	text-align: center;
+}
+
+.two_way_list_selector .select_btn div {
+	height: 250px;
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.two_way_list_selector .select_btn div input {
+	width: 90%;
+	margin: 1px;
+	text-align: center;
+	font-weight: 100;
+	color: #999;
+}
+
+.two_way_list_selector .select_l .select_a .is_select,.two_way_list_selector .select_r .select_b .is_select
+	{
+	color: #FFF;
+	background: #3399FF;
+}

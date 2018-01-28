@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.tdk3A.systemmanagement.dao.AttendanceMachineDSDao">
+    
+	<select id="getAllAttendance" resultType="AttendanceMachineDSEntity">
+		select * from [bsv5].[dbo].[st_device]
+	</select>
+	
+	<select id="getAttendanceById" resultType="AttendanceMachineDSEntity">
+		select count(0) as num from st_device where BH = ${bh}
+	</select>
+	
+	
+	<insert id="addAttendance">
+		insert into st_device
+		  (bh,
+		   mc,
+		   bz,
+		   ip,
+		   com,
+		   port,
+		   btl,
+		   mm,
+		   zt,
+		   sj,
+		   xs,
+		   mj,
+		   pztj,
+		   pzlj,
+		   lx,
+		   yzfs,
+		   gly_no,
+		   gly_pass,
+		   mac,
+		   dev_xs,
+		   dev_lx,
+		   kmry,
+		   dyip,
+		   jksz,
+		   tjkq,
+		   on_line,
+		   run_state,
+		   dev_lb,
+		   dev_version,
+		   dev_up,
+		   max_flow_no,
+		   dev_lock,
+		   UPDATE_DATE,
+		   DEL_FLAG
+		   )
+		values
+		  ('${bh}',
+		   '${mc}',
+		   '${bz}',
+		   '${ip}',
+		   '${com}',
+		   '${port}',
+		   '${btl}',
+		   '${mm}',
+		   '${zt}',
+		   to_date(substr('${sj}',0,19),'yyyy-mm-dd hh24:mi:ss'),
+		   '${xs}',
+		   '${mj}',
+		   '${pztj}',
+		   '${pzlj}',
+		   '${lx}',
+		   '${yzfs}',
+		   '${glyNo}',
+		   '${glyPass}',
+		   '${mac}',
+		   '${devXs}',
+		   '${devLx}',
+		   '${kmry}',
+		   '${dyip}',
+		   '${jksz}',
+		   '${tjkq}',
+		   #{onLine},
+		   '${runState}',
+		   '${devLb}',
+		   '${devVersion}',
+		   '${devUp}',
+		   '${maxFlowNo}',
+		   '${devLock}',
+		   sysdate,
+		   '0'
+		   )
+		
+	</insert>
+	
+	<update id="updateAttendance">
+		update st_device
+		   set 
+		       mc          = '${mc}',
+		       bz          = '${bz}',
+		       ip          = '${ip}',
+		       com         = '${com}',
+		       port        = '${port}',
+		       btl         = '${btl}',
+		       mm          = '${mm}',
+		       zt          = '${zt}',
+		       sj          = to_date(substr('${sj}',0,19),'yyyy-mm-dd hh24:mi:ss'),
+		       xs          = '${xs}',
+		       mj          = '${mj}',
+		       pztj        = '${pztj}',
+		       pzlj        = '${pzlj}',
+		       lx          = '${lx}',
+		       yzfs        = '${yzfs}',
+		       gly_no      = '${glyNo}',
+		       gly_pass    = '${glyPass}',
+		       mac         = '${mac}',
+		       dev_xs      = '${devXs}',
+		       dev_lx      = '${devLx}',
+		       kmry        = '${kmry}',
+		       dyip        = '${dyip}',
+		       jksz        = '${jksz}',
+		       tjkq        = '${tjkq}',
+		       on_line     = #{onLine},
+		       run_state   = '${runState}',
+		       dev_lb      = '${devLb}',
+		       dev_version = '${devVersion}',
+		       dev_up      = '${devUp}',
+		       max_flow_no = '${maxFlowNo}',
+		       dev_lock    = '${devLock}',
+		       UPDATE_DATE = sysdate,
+		       DEL_FLAG    = '0'
+		 where bh = '${bh}'
+		
+	</update>
+	
+	
+	<update id="deleteAttendance">
+		UPDATE st_device SET 	
+			del_flag = '1'
+		WHERE bh = '${bh}'
+	</update>
+	
+	<select id="getAllAttendanceByUpdate" resultType="AttendanceMachineDSEntity">
+		select * from st_device where update_date &lt; to_date(to_char(sysdate,'yyyy-mm-dd'),'yyyy-mm-dd')
+	</select>
+	
+</mapper>
