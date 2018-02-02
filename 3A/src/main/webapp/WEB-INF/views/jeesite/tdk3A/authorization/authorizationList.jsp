@@ -14,20 +14,25 @@
 			var cardNo = $("#cardNo").val();
 			var userName = $("#userName").val();
 			var officeId = $("#officeId").val();
+			var cardStatus = $("#cardStatus").val();
 			var pageNo = $("#pageNo").val();
 			var pageSize = $("#pageSize").val();
 			console.log(officeId);
 			$.ajax({
 				type : "POST",
 				dataType : "json",
-				data : {"userNo":userNo,"cardNo":cardNo,"userName":userName,"officeId":officeId,"pageNo":pageNo,"pageSize":pageSize},
+				data : {"cardStatus":cardStatus,"userNo":userNo,"cardNo":cardNo,"userName":userName,"officeId":officeId,"pageNo":pageNo,"pageSize":pageSize},
 				url : "/3A/a/authorization/authorization/getAuthorizationList",
 				async : true,
 				success : function(data) {
-					console.log(data)
+					//console.log(data);
 					$("#contentTableTbody").children().remove();
 					$("#pageDiv").children().remove();
 					var list = data[0].list;
+					if(list == undefined){
+						$("#pageDiv").append(data[0].html);
+						return;
+					}
 					var html = '';
 					var status = "";
 					for(var i=0;i<list.length;i++){
@@ -91,6 +96,13 @@
 			<li><label>部门名称：</label>
 				<sys:treeselect id="office" name="office.id" value="${testData.office.id}" labelName="office.name" labelValue="${testData.office.name}"
 					title="部门" url="/sys/office/treeData?type=2" cssClass="input-small" allowClear="true" notAllowSelectParent="true"/>
+			</li>
+			<li><label>卡状态：</label>
+				<select id="cardStatus">
+					<option value="">请选择状态</option>
+					<option value="0">可用</option>
+					<option value="1">不可用</option>
+				</select>
 			</li>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" value="查询" type="button" onclick="getAuthorizationList()"/></li>
 			<li class="clearfix"></li>

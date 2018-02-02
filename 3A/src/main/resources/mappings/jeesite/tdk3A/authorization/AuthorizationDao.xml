@@ -38,6 +38,12 @@
 		<if test="userId != null and userId != ''">
 			and a.id = #{userId}
 		</if>
+		<if test="cardStatus != null and cardStatus != '' and cardStatus != 1">
+			and c.flag = #{cardStatus}
+		</if>
+		<if test="cardStatus == 1">
+			and c.flag is null
+		</if>
 		order by a.no
 	</select>
 	
@@ -219,10 +225,24 @@
 	</update>
 	
 	<insert id="addPrivilege">
-		insert into [AccessData].[dbo].[t_d_privilege]
+		<!-- 向门禁系统数据库插入数据，取消与门禁系统数据库交互后，采用向本地数据库插入数据方式 -->
+		<!-- insert into [AccessData].[dbo].[t_d_privilege]
 		  (f_doorid, f_controlsegid, f_consumerid, f_controllerid, f_doorno)
 		values
 		  (
+		  '${fDoorid}', 
+		  '1', 
+		  '${doorId}', 
+		  '${fControllerid}', 
+		  '${fDoorno}') -->
+		  
+		  <!-- 向本地系统数据库插入数据 -->
+		  
+		  insert into t_d_privilege
+		  (F_PRIVILEGERECID, f_doorid, f_controlsegid, f_consumerid, f_controllerid, f_doorno)
+		values
+		  (
+		  (select nvl(max(to_number(F_PRIVILEGERECID)),0)+1 from t_d_privilege),
 		  '${fDoorid}', 
 		  '1', 
 		  '${doorId}', 

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.tdk3A.tbController.dao.TbControllerDAO">
+    
+	<select id="findList" resultType="TBEntity">
+		SELECT 
+			*
+		from t_b_controller a
+		WHERE a.del_flag=0
+		  and  1=1
+		<if test="fControllerid != null and fControllerid != ''">
+			and a.f_controllerid = #{fControllerid}
+		</if>
+		<if test="fControllerno != null and fControllerno != ''">
+			and a.f_controllerno = #{fControllerno}
+		</if>
+		<if test="fNote != null and fNote != ''">
+			and a.f_note like '%'||#{fNote}||'%'
+		</if>
+		order by a.f_controllerid
+	</select>
+	
+	<select id="findController" resultType="TBEntity">
+		SELECT 
+			*
+		from t_b_controller a
+		WHERE a.del_flag=0
+		  and  a.f_controllerid = #{fControllerid}
+	</select>
+	
+	<insert id="insert">
+		insert into t_b_controller
+		  (f_controllerid,
+		   f_controllerno,
+		   f_controllersn,
+		   f_enabled,
+		   f_ip,
+		   f_port,
+		   f_note,
+		   f_doornames,
+		   f_zoneid,
+		   f_antiback,
+		   f_interlock,
+		   f_morecards_goinout,
+		   f_doorinvalidopen,
+		   f_dooropentoolong,
+		   f_forcewarn,
+		   f_invalidcardwarn,
+		   <!-- f_peripheralcontrol, -->
+		   f_lastdeladddatetime,
+		   f_lastdeladdconsuemrstotal,
+		   f_lastdeladdanduploaddatetime,
+		   f_lastdeladdanduploadconsuemrs,
+		   <!-- f_lastconsoleuploaddatetime, -->
+		   f_lastconsoleuploadconsuemrsto,
+		   f_lastconsoleuploadprivilege,
+		   f_lastconsoleuploadvalidprivil,
+		   update_date,
+		   del_flag)
+		values
+		  (#{fControllerid},
+		   #{fControllerno},
+		   #{fControllersn},
+		   1,
+		   #{fIp},
+		   #{fPort},
+		   #{fNote},
+		   #{fDoornames},
+		   0,
+		   0,
+		   0,
+		   85,
+		   0,
+		   0,
+		   0,
+		   0,
+		   <!-- fPeripheralcontrol, -->
+		   to_char(sysdate,'yyyy-MM-dd HH24:mi:ss'),
+		   1,
+		   to_char(sysdate,'yyyy-MM-dd HH24:mi:ss'),
+		   1,
+		   <!-- '', -->
+		   0,
+		   0,
+		   0,
+		   sysdate,
+		   '0')
+	</insert>
+	<update id="update">
+		update t_b_controller
+		   set 
+		       f_controllersn = #{fControllersn},
+		       f_ip = #{fIp},
+		       f_port = #{fPort},
+		       f_note = #{fNote},
+		       f_doornames = #{fDoornames}
+		       
+		 where f_controllerid = #{fControllerid}
+	</update>
+	<delete id="delete">
+		delete t_b_controller
+		 where f_controllerid = #{fControllerid}
+	</delete>
+	<insert id="insertTbDoor">
+		insert into t_b_door
+		  (f_doorid,
+		   f_controllerid,
+		   f_doorno,
+		   f_doorname,
+		   f_doorcontrol,
+		   f_doordelay,
+		   f_doorenabled,
+		   f_morecards_total,
+		   f_morecards_grp1,
+		   f_morecards_grp2,
+		   f_morecards_grp3,
+		   f_morecards_grp4,
+		   f_morecards_grp5,
+		   f_morecards_grp6,
+		   f_morecards_grp7,
+		   f_morecards_grp8,
+		   f_morecards_option,
+		   f_firstcard_enabled,
+		   f_firstcard_weekday,
+		   f_firstcard_beginhms,
+		   f_firstcard_begincontrol,
+		   f_firstcard_endhms,
+		   f_firstcard_endcontrol)
+		values
+		  (#{fDoorid},
+		   #{fControllerid},
+		   1,
+		   #{fDoorname},
+		   3,
+		   3,
+		   1,
+		   0,
+		   0,
+		   0,
+		   0,
+		   0,
+		   0,
+		   0,
+		   0,
+		   0,
+		   0,
+		   0,
+		   127,
+		   '00:00:00',
+		   0,
+		   '00:00:00',
+		   0)
+	</insert>
+	
+	<update id="updateTbDoor">
+	update t_b_door
+	   set 
+	       f_doorname = #{fDoorname}
+	      
+	 where f_controllerid = #{fControllerid}
+	</update>
+	<delete id="deleteTbDoor">
+		delete t_b_door where f_controllerid = #{fControllerid}
+	</delete>
+	
+	<select id="getControllerById" resultType="TBEntity">
+		select f_controllerid,f_controllerno from t_b_controller where f_controllerid = #{fControllerid} or f_controllerno = #{fControllerno}
+	</select>
+	
+</mapper>

@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.thinkgem.jeesite.common.db.CustomerContextHolder;
+import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.common.utils.StringUtils;
@@ -36,6 +38,7 @@ public class OaNotifyController extends BaseController {
 	
 	@ModelAttribute
 	public OaNotify get(@RequestParam(required=false) String id) {
+		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 		OaNotify entity = null;
 		if (StringUtils.isNotBlank(id)){
 			entity = oaNotifyService.get(id);
@@ -49,6 +52,7 @@ public class OaNotifyController extends BaseController {
 	@RequiresPermissions("oa:oaNotify:view")
 	@RequestMapping(value = {"list", ""})
 	public String list(OaNotify oaNotify, HttpServletRequest request, HttpServletResponse response, Model model) {
+		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 		Page<OaNotify> page = oaNotifyService.find(new Page<OaNotify>(request, response), oaNotify);
 		model.addAttribute("page", page);
 		return "modules/oa/oaNotifyList";
@@ -57,6 +61,7 @@ public class OaNotifyController extends BaseController {
 	@RequiresPermissions("oa:oaNotify:view")
 	@RequestMapping(value = "form")
 	public String form(OaNotify oaNotify, Model model) {
+		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 		if (StringUtils.isNotBlank(oaNotify.getId())){
 			oaNotify = oaNotifyService.getRecordList(oaNotify);
 		}
@@ -67,6 +72,7 @@ public class OaNotifyController extends BaseController {
 	@RequiresPermissions("oa:oaNotify:edit")
 	@RequestMapping(value = "save")
 	public String save(OaNotify oaNotify, Model model, RedirectAttributes redirectAttributes) {
+		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 		if (!beanValidator(model, oaNotify)){
 			return form(oaNotify, model);
 		}
@@ -86,6 +92,7 @@ public class OaNotifyController extends BaseController {
 	@RequiresPermissions("oa:oaNotify:edit")
 	@RequestMapping(value = "delete")
 	public String delete(OaNotify oaNotify, RedirectAttributes redirectAttributes) {
+		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 		oaNotifyService.delete(oaNotify);
 		addMessage(redirectAttributes, "删除通知成功");
 		return "redirect:" + adminPath + "/oa/oaNotify/?repage";
@@ -96,6 +103,7 @@ public class OaNotifyController extends BaseController {
 	 */
 	@RequestMapping(value = "self")
 	public String selfList(OaNotify oaNotify, HttpServletRequest request, HttpServletResponse response, Model model) {
+		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 		oaNotify.setSelf(true);
 		Page<OaNotify> page = oaNotifyService.find(new Page<OaNotify>(request, response), oaNotify); 
 		model.addAttribute("page", page);
@@ -109,6 +117,7 @@ public class OaNotifyController extends BaseController {
 	@RequestMapping(value = "selfData")
 	@ResponseBody
 	public Page<OaNotify> listData(OaNotify oaNotify, HttpServletRequest request, HttpServletResponse response, Model model) {
+		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 		oaNotify.setSelf(true);
 		Page<OaNotify> page = oaNotifyService.find(new Page<OaNotify>(request, response), oaNotify);
 		return page;
@@ -119,6 +128,7 @@ public class OaNotifyController extends BaseController {
 	 */
 	@RequestMapping(value = "view")
 	public String view(OaNotify oaNotify, Model model) {
+		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 		if (StringUtils.isNotBlank(oaNotify.getId())){
 			oaNotifyService.updateReadFlag(oaNotify);
 			oaNotify = oaNotifyService.getRecordList(oaNotify);
@@ -134,6 +144,7 @@ public class OaNotifyController extends BaseController {
 	@RequestMapping(value = "viewData")
 	@ResponseBody
 	public OaNotify viewData(OaNotify oaNotify, Model model) {
+		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 		if (StringUtils.isNotBlank(oaNotify.getId())){
 			oaNotifyService.updateReadFlag(oaNotify);
 			return oaNotify;
@@ -147,6 +158,7 @@ public class OaNotifyController extends BaseController {
 	@RequestMapping(value = "viewRecordData")
 	@ResponseBody
 	public OaNotify viewRecordData(OaNotify oaNotify, Model model) {
+		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 		if (StringUtils.isNotBlank(oaNotify.getId())){
 			oaNotify = oaNotifyService.getRecordList(oaNotify);
 			return oaNotify;
@@ -160,6 +172,7 @@ public class OaNotifyController extends BaseController {
 	@RequestMapping(value = "self/count")
 	@ResponseBody
 	public String selfCount(OaNotify oaNotify, Model model) {
+		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 		oaNotify.setSelf(true);
 		oaNotify.setReadFlag("0");
 		return String.valueOf(oaNotifyService.findCount(oaNotify));

@@ -156,26 +156,28 @@ public class AuthorizationController extends BaseController {
 	@RequestMapping(value = "addAttendanceFun")
 	@ResponseBody
 	public List<Object> addAttendanceFun(AuthorizationEntity authorizationEntity, HttpServletRequest request, HttpServletResponse response, Model model){
+		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 		List<AuthorizationEntity> list = new ArrayList<AuthorizationEntity>();
 		List<Object> result = new ArrayList<Object>();
-		//查询当前用户是否已经存在卡号信息，若不存在则为新员工，并将卡号信息插入到sys_card表，把用户信息插入到EHR系统dt_user表
+		//查询当前用户是否已经存在卡号信息，若不存在则为新员工，并将卡号信息插入到sys_card表，把用户信息插入到考勤系统dt_user表
 		List<AuthorizationEntity> listCount = authorizationService.getUserCardCount(authorizationEntity);
 		//获取前台传过来的新的门禁信息并存在数组中备用
 		String[] doorArr = authorizationEntity.getDoorMessage().split(",");
 		
 		String cardNo = authorizationEntity.getCardNo();
 		
-		//String cqCardNo = cardNo;
+		//String cqCardNo = cardNo; 考勤取员工号后5位并在前面加0
 		String cqCardNo=authorizationEntity.getCardNo().substring(authorizationEntity.getCardNo().length()-5,authorizationEntity.getCardNo().length());
 		cqCardNo = "0"+cqCardNo;
 		
 		
 		if(listCount != null && listCount.get(0) != null){
+			//新员工(未发卡)（userno为空）
 			if("0".equals(listCount.get(0).getNum())){
 				
 				//新员工,将卡号信息插入到sys_card表，
-				DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 				authorizationService.addUserCard(authorizationEntity);
+			
 				/************考勤授权********************/
 				//把用户信息插入到EHR系统dt_user表
 				DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_C);
@@ -189,13 +191,11 @@ public class AuthorizationController extends BaseController {
 				}
 				/************门禁授权********************/
 				authorizationEntity.setCardNo(cardNo);
-				
-				//更新sys_user表中的door_id,赋值为max(door_id)+1
+				//插入当前用户门禁权限信息到考勤系统中的[AccessData].[dbo].[t_d_privilege]
+				//DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_D);
+				//控制器和用户关联信息保存到3A数据库
+				//需要循环前台配置的控制器信息，然后插入到数据库并授权
 				DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
-				authorizationService.updateDoorId(authorizationEntity);
-				//插入当前用户门禁权限信息到EHR系统中的[AccessData].[dbo].[t_d_privilege]
-				DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_D);
-				//需要循环获取每一个控制器doorMessage，然后插入到数据库并授权
 				for(int i=0;i<doorArr.length;i++){
 					String[] doorList = doorArr[i].split(";");
 					authorizationEntity.setfControllerno(doorList[0]);
@@ -206,11 +206,12 @@ public class AuthorizationController extends BaseController {
 					authorizationEntity.setfControllersn(doorList[5]);
 					authorizationService.addPrivilege(authorizationEntity);
 					//控制器授权
+					//保存到本地-------------!!!!!!!-----------
 					controllerAuthorization(authorizationEntity);
 				}//授权结束
 				
 				//同步当前用户门禁权限信息到t_d_privilege
-				DataPrivilegeDS(authorizationEntity);
+				//DataPrivilegeDS(authorizationEntity);
 			}else{
 				//不是新员工
 				//获取用户可用卡号信息
@@ -219,19 +220,28 @@ public class AuthorizationController extends BaseController {
 				if(listCard.size() == 0){
 					/************考勤授权********************/
 					authorizationEntity.setCardNo(cardNo);
-					//将卡号信息插入到sys_card表，
+					//将卡号信息插入到sys_card表，新卡号与员工绑定
 					DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
+					//将卡号信息插入到sys_card表，新卡号与员工绑定
 					authorizationService.addUserCard(authorizationEntity);
-					//EHR系统dt_user表的用户信息
+					//考勤系统dt_user表的用户信息
 					DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_C);
 					authorizationEntity.setCardNo(cqCardNo);
-					authorizationService.updateAttendanceFun(authorizationEntity);
+					//-----------!!!!!!先查询，有update，无add
+					//authorizationService.updateAttendanceFun(authorizationEntity);
+					list = authorizationService.getAttendanceByUserNo(authorizationEntity);
+					if("0".equals(list.get(0).getNum())){
+						authorizationService.addAttendanceFun(authorizationEntity);
+					}else{
+						authorizationService.updateAttendanceFun(authorizationEntity);
+					}
 					
 					/************门禁授权********************/
 					/************门禁授权********************/
 					//获取当前用户原有的控制器权限信息
 					DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 					authorizationEntity.setCardNo(cardNo);
+					//获得
 					List<AuthorizationEntity> listUsersPrivilege = authorizationService.getPrivilegeByDoorId(authorizationEntity);
 					//遍历结果集，删除用户对应控制器的权限信息
 					for(int i=0;i<listUsersPrivilege.size();i++){
@@ -242,15 +252,17 @@ public class AuthorizationController extends BaseController {
 					}
 					//删除当前用户原有的门禁信息，并把新的门禁信息插入到[AccessData].[dbo].[t_d_privilege]和t_d_privilege
 					authorizationService.deletePrivilegeTo3A(authorizationEntity);
-					/*//插入新的门禁信息到3A
-					authorizationService.addPrivilegeTo3A(authorizationEntity);*/
-					DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_D);
-					authorizationService.deletePrivilegeToEHR(authorizationEntity);
-					/*//插入新的门禁信息到EHR
+					//插入新的门禁信息到3A------!!!!!-------需要保存到本地注释需要放开
+					//authorizationService.addPrivilegeTo3A(authorizationEntity);
+					//取消与门禁系统的交互
+					//DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_D);
+					//authorizationService.deletePrivilegeToEHR(authorizationEntity);
+					/*//插入新的门禁信息到门禁系统
 					authorizationService.addPrivilege(authorizationEntity);*/
 					//控制器授权
 					//需要循环获取每一个控制器doorMessage，然后插入到数据库并授权
 					//String[] doorArr = authorizationEntity.getDoorMessage().split(",");
+					DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 					for(int i=0;i<doorArr.length;i++){
 						String[] doorList = doorArr[i].split(";");
 						authorizationEntity.setfControllerno(doorList[0]);
@@ -259,17 +271,20 @@ public class AuthorizationController extends BaseController {
 						authorizationEntity.setfDoorno(doorList[3]);
 						authorizationEntity.setfIp(doorList[4]);
 						authorizationEntity.setfControllersn(doorList[5]);
+						//保存到本地需要放开注释--------!!!!!!!--------
 						authorizationService.addPrivilege(authorizationEntity);
 						//控制器授权
 						controllerAuthorization(authorizationEntity);
 					}//授权结束
-					//同步当前用户门禁权限信息到t_d_privilege（插入新的门禁信息到3A）
-					DataPrivilegeDS(authorizationEntity);
+					//同步当前用户门禁权限信息到t_d_privilege（插入新的门禁信息到3A）不需要同步
+					//DataPrivilegeDS(authorizationEntity);
 					
 				}else{
+					
 					authorizationEntity.setCardNo(cardNo);
 					//获取查询结果中的卡号，与页面中获取用户的卡号对比，若卡号相同，更改权限结束，若不同换新卡
 					if(authorizationEntity.getCardNo().equals(listCard.get(0).getCardNo())){
+						//老员工换权限
 						/************门禁授权********************/
 						/************门禁授权********************/
 						//获取当前用户原有的控制器权限信息
@@ -286,13 +301,15 @@ public class AuthorizationController extends BaseController {
 						authorizationService.deletePrivilegeTo3A(authorizationEntity);
 						/*//插入新的门禁信息到3A
 						authorizationService.addPrivilegeTo3A(authorizationEntity);*/
-						DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_D);
-						authorizationService.deletePrivilegeToEHR(authorizationEntity);
-						/*//插入新的门禁信息到EHR
+						//取消与门禁系统交互
+//						DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_D);
+//						authorizationService.deletePrivilegeToEHR(authorizationEntity);
+						/*//插入新的门禁信息到门禁系统
 						authorizationService.addPrivilege(authorizationEntity);*/
 						//控制器授权
 						//需要循环获取每一个控制器doorMessage，然后插入到数据库并授权
 						//String[] doorArr = authorizationEntity.getDoorMessage().split(",");
+						DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 						for(int i=0;i<doorArr.length;i++){
 							String[] doorList = doorArr[i].split(";");
 							authorizationEntity.setfControllerno(doorList[0]);
@@ -301,19 +318,23 @@ public class AuthorizationController extends BaseController {
 							authorizationEntity.setfDoorno(doorList[3]);
 							authorizationEntity.setfIp(doorList[4]);
 							authorizationEntity.setfControllersn(doorList[5]);
+							//保存到3A数据库，需要修改------!!!!!--------
 							authorizationService.addPrivilege(authorizationEntity);
 							//控制器授权
 							controllerAuthorization(authorizationEntity);
 						}//授权结束
 						//同步当前用户门禁权限信息到t_d_privilege（插入新的门禁信息到3A）
-						DataPrivilegeDS(authorizationEntity);
+					//	DataPrivilegeDS(authorizationEntity);
 						/************考勤授权********************/
 						result.add(0,"1");
 						DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 						
 					}else{
+						//老员工换卡
 						/************考勤授权********************/
 						authorizationEntity.setCardNo(cardNo);
+						/*//更新sys_user表中的door_id,赋值为max(door_id)+1(针对换卡情况)
+						//authorizationService.updateDoorId(authorizationEntity);
 						//若不同换新卡
 						DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 						//将原卡号置为不可用
@@ -322,9 +343,16 @@ public class AuthorizationController extends BaseController {
 						//将卡号信息插入到sys_card表，
 						authorizationService.addUserCard(authorizationEntity);
 						authorizationEntity.setCardNo(cqCardNo);
-						//EHR系统dt_user表的用户信息
+						//考勤系统dt_user表的用户信息
 						DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_C);
-						authorizationService.updateAttendanceFun(authorizationEntity);
+						//------!!!!!-----加判断有update，无add
+						//authorizationService.updateAttendanceFun(authorizationEntity);
+						list = authorizationService.getAttendanceByUserNo(authorizationEntity);
+						if("0".equals(list.get(0).getNum())){
+							authorizationService.addAttendanceFun(authorizationEntity);
+						}else{
+							authorizationService.updateAttendanceFun(authorizationEntity);
+						}
 						
 						/************门禁授权********************/
 						//获取当前用户原有的控制器权限信息
@@ -342,13 +370,15 @@ public class AuthorizationController extends BaseController {
 						authorizationService.deletePrivilegeTo3A(authorizationEntity);
 						/*//插入新的门禁信息到3A
 						authorizationService.addPrivilegeTo3A(authorizationEntity);*/
-						DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_D);
-						authorizationService.deletePrivilegeToEHR(authorizationEntity);
+						//取消与门禁系统交互 
+//						DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_D);
+//						authorizationService.deletePrivilegeToEHR(authorizationEntity);
 						/*//插入新的门禁信息到EHR
 						authorizationService.addPrivilege(authorizationEntity);*/
 						//控制器授权
 						//需要循环获取每一个控制器doorMessage，然后插入到数据库并授权
 						//String[] doorArr = authorizationEntity.getDoorMessage().split(",");
+						DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 						for(int i=0;i<doorArr.length;i++){
 							String[] doorList = doorArr[i].split(";");
 							authorizationEntity.setfControllerno(doorList[0]);
@@ -357,12 +387,13 @@ public class AuthorizationController extends BaseController {
 							authorizationEntity.setfDoorno(doorList[3]);
 							authorizationEntity.setfIp(doorList[4]);
 							authorizationEntity.setfControllersn(doorList[5]);
+							//-----!!!!-------门禁保存到3A系统
 							authorizationService.addPrivilege(authorizationEntity);
 							//控制器授权
 							controllerAuthorization(authorizationEntity);
 						}//授权结束
 						//同步当前用户门禁权限信息到t_d_privilege（插入新的门禁信息到3A）
-						DataPrivilegeDS(authorizationEntity);
+						//DataPrivilegeDS(authorizationEntity);
 					}
 				}
 			}
@@ -371,6 +402,7 @@ public class AuthorizationController extends BaseController {
 			DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 			return result;
 		}
+		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 		authorizationEntity.setCardNo(cardNo);
 		User user = new User();
 		user.setId(authorizationEntity.getUserId());
@@ -397,7 +429,6 @@ public class AuthorizationController extends BaseController {
 			sysUserDep_new.setDelFlag("0");
 			sysuserdepservice.save(sysUserDep_new);
 		}
-		
 		//餐卡授权
 		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_E);
 		List<AuthorizationEntity> listSTPerson = authorizationService.findSTPersonById(authorizationEntity);
@@ -413,10 +444,7 @@ public class AuthorizationController extends BaseController {
 			authorizationService.updateSTPerson(authorizationEntity);
 		}
 		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
-		
-		
 		result.add(0,"1");
-		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 		return result;
 	}
 	
@@ -458,10 +486,11 @@ public class AuthorizationController extends BaseController {
 				authorizationEntity.setfControllersn(listUsersPrivilege.get(i).getfControllersn());
 				delControllerAuthorization(authorizationEntity);
 			}
-			//删除当前用户原有的门禁信息，并把新的门禁信息插入到[AccessData].[dbo].[t_d_privilege]和t_d_privilege
+			//删除当前用户原有的门禁信息，------并把新的门禁信息插入到[AccessData].[dbo].[t_d_privilege]和t_d_privilege
 			authorizationService.deletePrivilegeTo3A(authorizationEntity);
-			DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_D);
-			authorizationService.deletePrivilegeToEHR(authorizationEntity);
+			//取消与门襟系统的交互
+			//DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_D);
+			//authorizationService.deletePrivilegeToEHR(authorizationEntity);
 			//控制器授权
 			//需要循环获取每一个控制器doorMessage，然后插入到数据库并授权
 			for(int i=0;i<doorArr.length;i++){
@@ -478,7 +507,7 @@ public class AuthorizationController extends BaseController {
 			}//授权结束
 		}
 		//同步当前用户门禁权限信息到t_d_privilege（插入新的门禁信息到3A）
-		DataPrivilegeDS(authorizationEntity);
+		//DataPrivilegeDS(authorizationEntity);
 		result.add(0,"1");
 		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 		return result;

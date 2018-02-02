@@ -210,7 +210,7 @@ public class SystemManagementController extends BaseController {
 				}
 			}
 		}
-		       //根据当前日期查询人员信息，凡是更新日期在今日之前的人员删除
+		       //根据当前日期查询人员信息，凡是更新日期在今日之前的删除
 				List<SystemManagementEntity> listForDel = new ArrayList<SystemManagementEntity>();
 				listForDel = systemManagementService.getListByUpdate(entity);
 				if(listForDel.size()>0){

@@ -153,7 +153,7 @@
 				},
 				error : function(){
 					//alert("考勤授权失败");
-					showTip("考勤授权失败!","",2000,500);
+					showTip("授权失败!","",2000,500);
 				},
 				complete:function(XMLHttpRequest,textStatus){
 					//关闭加载框

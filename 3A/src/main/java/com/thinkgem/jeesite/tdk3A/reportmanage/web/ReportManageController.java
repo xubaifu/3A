@@ -14,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.thinkgem.jeesite.common.db.CustomerContextHolder;
+import com.thinkgem.jeesite.common.db.DynamicDataSource;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.tdk3A.reportmanage.entity.ReportManage;
@@ -85,6 +87,7 @@ public class ReportManageController extends BaseController {
 	@RequiresPermissions("reportmanage:mealCardReport:view")
 	@RequestMapping(value = {"findPersonList"})
 	public String findPersonList(ReportManage reportManage, HttpServletRequest request, HttpServletResponse response, Model model) {
+		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 		Page<ReportManage> page = reportManageService.findPersonList(new Page<ReportManage>(request, response), reportManage); 
 		model.addAttribute("page", page);
 		List<ReportManage> sumResult = reportManageService.sum(reportManage);

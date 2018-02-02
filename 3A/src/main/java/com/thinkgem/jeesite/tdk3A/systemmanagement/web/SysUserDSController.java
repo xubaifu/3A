@@ -201,7 +201,7 @@ public class SysUserDSController extends BaseController {
 					authorizationEntity.setKqId(entity.getKQID());
 					authorizationEntity.setUserType("51");
 					List<AuthorizationEntity> listUsersPrivilege = authorizationService.getPrivilegeByDoorId(authorizationEntity);
-					DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_B);
+					DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_C);
 					authorizationService.updateAttendanceFun(authorizationEntity);
 					authorizationEntity.setDoorId(listForDel.get(j).getDoorid());
 					//遍历结果集，删除用户对应控制器的权限信息
@@ -214,7 +214,8 @@ public class SysUserDSController extends BaseController {
 					}
 					/*//插入新的门禁信息到3A
 					authorizationService.addPrivilegeTo3A(authorizationEntity);*/
-					authorizationService.deletePrivilegeToEHR(authorizationEntity);
+					//取消与门禁的交互
+					//authorizationService.deletePrivilegeToEHR(authorizationEntity);
 					DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
 					//删除当前用户原有的门禁信息，并把新的门禁信息插入到[AccessData].[dbo].[t_d_privilege]和t_d_privilege
 					authorizationService.deletePrivilegeTo3A(authorizationEntity);

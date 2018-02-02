@@ -78,7 +78,8 @@ public class TDSwiperecordController extends BaseController {
 		//startOrEndController();
 		
         Calendar calendar = Calendar.getInstance();  
-        calendar.set(Calendar.HOUR_OF_DAY, startTime.getDay()); // 控制时  
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH)+1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0); // 控制时  
         calendar.set(Calendar.MINUTE, 0);       // 控制分  
         calendar.set(Calendar.SECOND, 0);       // 控制秒  
    
@@ -92,6 +93,7 @@ public class TDSwiperecordController extends BaseController {
         }else{//启动定时任务
         	if(timer == null){//首次启动
         		timer = new Timer();
+        		startOrEndTDSwiperecord();
         	}else{//重复启动
         		timer.cancel();
         		timer = null;
