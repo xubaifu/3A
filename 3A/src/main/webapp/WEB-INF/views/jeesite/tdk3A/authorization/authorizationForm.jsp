@@ -391,5 +391,18 @@
 		<input id="btnSubmit" class="btn btn-primary" type="button" value="授权，提交" onclick="addAttendanceFun()"/>
 		<a id="goBack" class="btn btn-primary" href="${ctx}/authorization/authorization/" style="display: none;">返回</a>
 	</div>
+	
+	<script>
+	//去除重复门禁
+	for(var i = 0; i < $("#doorList div").length; i++){
+		console.log($("#doorList div:eq("+i+")"));
+		for(var j = 0; j < $("#selectDoor div").length; j++){
+			console.log($("#selectDoor div:eq("+j+")"));
+			if($("#doorList div:eq("+i+")").attr("data-value") == $("#selectDoor div:eq("+j+")").attr("data-value")){
+				$("#doorList div:eq("+i+")").hide();
+			}
+		}
+	}
+	</script>
 </body>
 </html>

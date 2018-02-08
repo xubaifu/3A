@@ -137,7 +137,6 @@ public class AuthorizationController extends BaseController {
 		List<AuthorizationEntity> listAttendance = authorizationService.getAttendanceController(authorization);
 		//获取用户权限下所有的门禁控制器
 		 
-		
 		model.addAttribute("list", list);
 		model.addAttribute("listDoor", listDoor);
 		model.addAttribute("listAttendance", listAttendance);
@@ -333,7 +332,7 @@ public class AuthorizationController extends BaseController {
 						//老员工换卡
 						/************考勤授权********************/
 						authorizationEntity.setCardNo(cardNo);
-						/*//更新sys_user表中的door_id,赋值为max(door_id)+1(针对换卡情况)
+						//更新sys_user表中的door_id,赋值为max(door_id)+1(针对换卡情况)
 						//authorizationService.updateDoorId(authorizationEntity);
 						//若不同换新卡
 						DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);

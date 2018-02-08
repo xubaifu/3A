@@ -75,6 +75,24 @@ public class SysUserDSService extends CrudService<SysUserDSDao, SysUserDSEntity>
 	public void deleteUser(SysUserDSEntity entity){
 		sysUserDSDao.deleteUser(entity);
 	}
+	
+	/**
+	 * 获取餐卡系统的food_id
+	 * @param entity
+	 * @return
+	 */
+	public List<SysUserDSEntity> getFoodId(SysUserDSEntity entity){
+		return sysUserDSDao.getFoodId(entity);
+		
+	}
+	
+	/**
+	 * 更新food_id
+	 * @param entity
+	 */
+	public void updateFoodId(SysUserDSEntity entity){
+		sysUserDSDao.updateFoodId(entity);
+	}
 	/*public SysUserDSEntity get(String id) {
 		return super.get(id);
 	}

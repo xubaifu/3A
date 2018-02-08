@@ -26,6 +26,7 @@
 					fPort: {required: "不能为空"},
 				},
 				submitHandler: function(form){
+					console.log("gggggg")
 					var boo = true;
 					if($("#trpe").val() == "add"){
 						$.ajax({
@@ -35,18 +36,22 @@
 							url : "/3A/a/dbcontroller/manage/getControllerById",
 							async : false,
 							success : function(data) {
-								//console.log(data.length);
+								//console.log(data);
 								if(data.length > 0){
 									boo = false;
 									alert("控制器已存在");
 								}
 							}
 						});
-					}else{
+					}/* else{
 						if(boo){
 							//loading('正在提交，请稍等...');
 							form.submit();
 						}
+					} */
+					if(boo){
+						//loading('正在提交，请稍等...');
+						form.submit();
 					}
 				},
 				errorContainer: "#messageBox",

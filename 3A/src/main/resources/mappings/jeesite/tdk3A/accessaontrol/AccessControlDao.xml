@@ -32,8 +32,10 @@
 		<!-- select * from dept_con c left join sys_office o on o.id = c.dept_id -->
 		select
 			t.dept_id as deptId,
-			wm_concat(t.con_id) as conId,
-			wm_concat(d.f_doorname) as fDoorName,
+			<!-- wm_concat(t.con_id) as conId,
+			wm_concat(d.f_doorname) as fDoorName, -->
+			to_char(wmsys.wm_concat(t.con_id)) as conId,
+			to_char(wmsys.wm_concat(d.f_doorname)) as fDoorName,
 			o.name as name,
 			t.dept_id as id,
 			o.code as code

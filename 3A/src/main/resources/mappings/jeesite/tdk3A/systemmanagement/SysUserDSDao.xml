@@ -107,4 +107,15 @@
 	<select id="getAllUserByUpdate" resultType="SysUserDSEntity">
 		select * from sys_user where update_date &lt; to_date(to_char(sysdate,'yyyy-mm-dd'),'yyyy-mm-dd')
 	</select>
+	
+	<update id="updateFoodId">
+		UPDATE sys_user SET 	
+			food_id = #{foodId}
+		WHERE no = #{no} and id != '1'
+	</update>
+	
+	<select id="getFoodId" resultType="SysUserDSEntity">
+		<!-- select person_id as foodId from [STCard_Enp].[dbo].[st_person] where person_no = #{no} -->
+		select person_id as foodId,person_no as no from [STCard_Enp].[dbo].[ST_Person] 
+	</select>
 </mapper>

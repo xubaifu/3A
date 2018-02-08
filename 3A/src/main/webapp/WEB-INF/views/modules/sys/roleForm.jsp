@@ -97,7 +97,7 @@
 			// 默认展开全部节点
 			tree2.expandAll(false);
 			// 刷新（显示/隐藏）机构
-			refreshOfficeTree();
+			//refreshOfficeTree();
 			/* $("#dataScope").change(function(){
 				refreshOfficeTree();
 			}); */
@@ -291,10 +291,11 @@
 		<div class="control-group">
 			<label class="control-label">部门授权:</label>
 			<div class="controls">
-				<div id="menuTree" class="ztree" style="margin-top:3px;float:left;"></div>
-				<form:hidden path="menuIds"/>
 				<div id="officeTree" class="ztree" style="margin-left:100px;margin-top:3px;float:left;"></div>
 				<form:hidden path="officeIds"/>
+				<label class="control-label">菜单授权:</label>
+				<div id="menuTree" class="ztree" style="margin-top:3px;float:left;"></div>
+				<form:hidden path="menuIds"/>
 			</div>
 		</div>
 		<div class="control-group">

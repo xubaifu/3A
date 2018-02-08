@@ -54,6 +54,8 @@ public class SysUserDSEntity extends DataEntity<SysUserDSEntity> {
 	private String doorid;
 	public String num;
 	
+	private String foodId;
+	
 	public SysUserDSEntity() {
 		super();
 	}
@@ -273,6 +275,14 @@ public class SysUserDSEntity extends DataEntity<SysUserDSEntity> {
 
 	public void setKqDetailId(String kqDetailId) {
 		this.kqDetailId = kqDetailId;
+	}
+
+	public String getFoodId() {
+		return foodId;
+	}
+
+	public void setFoodId(String foodId) {
+		this.foodId = foodId;
 	}
 	
 	

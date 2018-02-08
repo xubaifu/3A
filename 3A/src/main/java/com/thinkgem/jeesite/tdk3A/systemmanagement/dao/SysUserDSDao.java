@@ -47,4 +47,16 @@ public interface SysUserDSDao extends CrudDao<SysUserDSEntity> {
 	 */
 	void deleteUser(SysUserDSEntity entity);
 	
+	/**
+	 * 更新food_id
+	 * @param entity
+	 */
+	void updateFoodId(SysUserDSEntity entity);
+	/**
+	 * 获取餐卡系统的food_id
+	 * @param entity
+	 * @return
+	 */
+	List<SysUserDSEntity> getFoodId(SysUserDSEntity entity);
+	
 }

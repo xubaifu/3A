@@ -160,6 +160,25 @@
 			
 		}
 	};
+	//更新food_id
+	function updateFoodId(){
+		$.ajax({
+			type : "POST",
+			dataType : "json",
+			data : {},
+			url : "/3A/a/systemmanagement/systemManagement/updateFoodId",
+			async : true,
+			success : function(data) {
+				console.log(data);
+				
+			},
+			error : function(){
+				alert("更新失败！");
+			}
+		});
+	}
+	
+	
 	//获取当前时间
 	function getNowFormatDate() {
 	    var date = new Date();
@@ -205,6 +224,8 @@
 				<!-- 取消与门禁系统的交互，不再同步门禁系统数据 -->
 					<input id="btnStart" onclick="startOend.startUser('START');" class="btn btn-primary" type="button" value="启动"/>
 					<input id="btnEnd" onclick="startOend.startUser('STOP');" class="btn btn-primary" type="button" value="停止"/>
+					
+					<input onclick="updateFoodId();" class="btn btn-primary" type="button" value="更新food_id"/>
 				</li>
 				<!-- <li class="clearfix"></li> -->
 			</ul>

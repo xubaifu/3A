@@ -36,7 +36,7 @@
 					loading('正在获取门禁列表，请稍等...');
 		         },
 				success : function(data) {
-					console.log(data)
+					//console.log(data)
 					 var html = '';
 					//var selectHtml = '';
 					//拼接未选择的门禁

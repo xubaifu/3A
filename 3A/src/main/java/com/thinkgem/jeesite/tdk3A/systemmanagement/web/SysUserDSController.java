@@ -98,6 +98,46 @@ public class SysUserDSController extends BaseController {
 	}
 	
 	/**
+	 * 更新food_id
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("systemmanagement:datamanagement:view")
+	@RequestMapping(value = "updateFoodId")
+	@ResponseBody
+	public String updateFoodId(HttpServletRequest request, HttpServletResponse response, Model model) {
+		
+		SysUserDSEntity entity = new SysUserDSEntity();
+		//切换到数据源餐卡数据库
+		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_E);
+		List<SysUserDSEntity> listEHR = new ArrayList<SysUserDSEntity>();
+		//使用ehr系统数据库查询EHR系统的人员信息
+		//listEHR = sysUserDSService.getUserFromEHR(entity);
+		
+		listEHR = sysUserDSService.getFoodId(entity);
+		
+		int length = listEHR.size();
+		//切换到数据源2（连接3A数据库）
+		DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_A);
+		//遍历查询结果，跟3A数据库中的人员信息对比，若有对应的结构，则修改为最新的，若没有则新增
+		//String no = "";
+		if(length>0){
+			for(int i = 0; i < length; i++){
+				entity.setNo(listEHR.get(i).getNo());
+				entity.setFoodId(listEHR.get(0).getFoodId());
+				//System.out.println(entity.getNo());
+				//System.out.println(entity.getFoodId());
+				//向3A数据库修改food_id
+				sysUserDSService.updateFoodId(entity);
+			}
+		}
+		
+		return "success";
+	}
+	
+	/**
 	 * 定时任务
 	 * @param startTime
 	 * @param timeLag
