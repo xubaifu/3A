@@ -40,4 +40,8 @@ public class TdControllerService extends CrudService<TbControllerDAO, TBEntity>{
 	public List<TBEntity> getControllerById(TBEntity tBEntity){
 		return tbControllerDAO.getControllerById(tBEntity);
 	}
+	
+	public List<TBEntity> getAllController(){
+		return tbControllerDAO.getAllController();
+	}
 }

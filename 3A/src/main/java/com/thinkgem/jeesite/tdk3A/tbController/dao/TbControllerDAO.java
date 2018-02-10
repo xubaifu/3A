@@ -17,5 +17,8 @@ public interface TbControllerDAO extends CrudDao<TBEntity>{
 	int delete(TBEntity tBEntity);
 	
 	List<TBEntity> getControllerById(TBEntity tBEntity);
+	
+	List<TBEntity> getAllController();
+	
 
 }

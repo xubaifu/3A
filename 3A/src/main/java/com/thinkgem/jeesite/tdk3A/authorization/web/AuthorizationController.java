@@ -29,6 +29,8 @@ import com.thinkgem.jeesite.tdk3A.authorization.entity.AuthorizationEntity;
 import com.thinkgem.jeesite.tdk3A.authorization.service.AuthorizationService;
 import com.thinkgem.jeesite.tdk3A.sysuserdept.entity.SysUserDep;
 import com.thinkgem.jeesite.tdk3A.sysuserdept.service.SysUserDepService;
+import com.thinkgem.jeesite.tdk3A.tbController.entity.TBEntity;
+import com.thinkgem.jeesite.tdk3A.tbController.service.TdControllerService;
 
 /**
  * 一卡通统一授权Controller
@@ -43,6 +45,8 @@ public class AuthorizationController extends BaseController {
 	private AuthorizationService authorizationService;
 	@Autowired
 	private SysUserDepService sysuserdepservice;
+	@Autowired
+	private TdControllerService tdControllerService;
 	/*@ModelAttribute
 	public AuthorizationEntity get(@RequestParam(required=false) String id) {
 		AuthorizationEntity entity = null;
@@ -179,7 +183,7 @@ public class AuthorizationController extends BaseController {
 			
 				/************考勤授权********************/
 				//把用户信息插入到EHR系统dt_user表
-				DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_C);
+				/*DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_C);
 				//现根据用户的no查询该用户是否有授权，有则更新，没有则添加
 				authorizationEntity.setCardNo(cqCardNo);
 				list = authorizationService.getAttendanceByUserNo(authorizationEntity);
@@ -187,9 +191,23 @@ public class AuthorizationController extends BaseController {
 					authorizationService.addAttendanceFun(authorizationEntity);
 				}else{
 					authorizationService.updateAttendanceFun(authorizationEntity);
-				}
+				}*/
 				/************门禁授权********************/
 				authorizationEntity.setCardNo(cardNo);
+				
+
+				//若是新员工，需要先把所有门禁遍历一遍，然后删除所有门禁权限（首次赋权的老员工需要此操作）
+				//获取所有门禁信息
+				List<TBEntity> allControllerList = tdControllerService.getAllController();
+				//遍历删除门禁信息
+				for(int i = 0; i < allControllerList.size(); i++){
+					authorizationEntity.setOldCardNo(cardNo);
+					authorizationEntity.setfIp(allControllerList.get(i).getfIp());
+					authorizationEntity.setfControllersn(allControllerList.get(i).getfControllersn());
+					delControllerAuthorization(authorizationEntity);
+				}
+				
+				
 				//插入当前用户门禁权限信息到考勤系统中的[AccessData].[dbo].[t_d_privilege]
 				//DynamicDataSource.setCurrentLookupKey(CustomerContextHolder.DATA_SOURCE_D);
 				//控制器和用户关联信息保存到3A数据库

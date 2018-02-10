@@ -167,4 +167,11 @@
 		select f_controllerid,f_controllerno from t_b_controller where f_controllerid = #{fControllerid} or f_controllerno = #{fControllerno}
 	</select>
 	
+	<select id="getAllController" resultType="TBEntity">
+		SELECT 
+			*
+		from t_b_controller a
+		WHERE a.del_flag=0
+	</select>
+	
 </mapper>
