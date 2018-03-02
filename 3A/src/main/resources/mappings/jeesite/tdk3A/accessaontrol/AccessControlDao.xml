@@ -6,6 +6,7 @@
 			* 
 		from t_b_controller c left join t_b_door d on c.f_controllerid = d.f_controllerid
 		where  c.f_controllerid in (select con.con_id from sys_role_con con where con.role_id in (${roleIds}))
+			and  c.f_zoneid = ${fZoneid}
 		order  by d.f_doorname
 	</select>
 	<insert id="insertIntoDeptCon">
@@ -24,7 +25,7 @@
 		    	from t_b_controller c left join t_b_door d on c.f_controllerid = d.f_controllerid
 		    ) t1
 		    on t.con_id = t1.f_controllerid
-		where t.dept_id = #{officeId}
+		where t.dept_id = #{officeId} 
 		order by t1.f_doorname
 	</select>
 	

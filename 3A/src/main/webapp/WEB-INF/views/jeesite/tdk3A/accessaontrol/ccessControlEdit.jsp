@@ -12,8 +12,9 @@
 			$("#officeId").val(sessionStorage.getItem("officeId"));
 			$("#officeName").val(sessionStorage.getItem("officeName"));
 			//监听下拉选择框是否改变
-			$("#selectArea").on("change", function() {
+			$("#fZoneid").on("change", function() {
 				var officeId = $("#officeId").val();
+				var fZoneid = $("#fZoneid").val();
 				if(officeId == null || officeId == ""){
 					showTip("请选择部门!","",2000,500);
 					return;
@@ -25,13 +26,14 @@
 				$.ajax({
 					type : "POST",
 					dataType : "json",
-					data : {"officeId":officeId },
+					data : {"officeId":officeId, "fZoneid":fZoneid },
 					url : "/3A/a/accessaontrol/accessControl/getAllDoorByArea",
 					async : true,
 					beforeSend:function(XMLHttpRequest){
 						loading('正在获取门禁列表，请稍等...');
 			         },
 					success : function(data) {
+						//console.log(data)
 						var html = '';
 						var selectHtml = '';
 						//拼接未选择的门禁
@@ -56,7 +58,7 @@
 						}
 						//拼接已选择的门禁
 						for(var i=0;i<data[1].length;i++){
-							if(data[0][i].fDoorname != null){
+							if(data[1][i].fDoorname != null){
 								/* html = html + '<div data-value="'+data[i].fControllerno+';'+data[i].fControllerid+';'+data[i].fDoorid+';'+data[i].fDoorno+';'+data[i].fIp+';'+data[i].fControllersn+'" data-index="0" class="item">'+ */
 								selectHtml = selectHtml + '<div data-value="'+data[1][i].fControllerid+'" data-index="0" class="item">'+
 								data[1][i].fDoorname+
@@ -82,7 +84,7 @@
 		});
 		//保存
 		var submitFun = function(){
-			console.log($("#officeId").val());
+			//console.log($("#officeId").val());
 			var officeId = $("#officeId").val();
 			if(officeId == null || officeId == ""){
 				showTip("请选择部门!","",2000,500);
@@ -91,7 +93,7 @@
 			//将门禁控制器的信息存入list，后台解析使用
 			var list=[];
 			$("#selectDoor div").each(function(index,element){
-				console.log(index+":"+$(this).attr("data-value"));
+				//console.log(index+":"+$(this).attr("data-value"));
 				list[index] = $(this).attr("data-value");
 			});
 			if(list.length == 0){
@@ -99,7 +101,7 @@
 				return;
 			}
 			var doorMessage = JSON.stringify(list).replace(/\"/g, '').replace(/\[/g, '').replace(/\]/g, '');
-			console.log(doorMessage);
+			//console.log(doorMessage);
 			$.ajax({
 				type : "POST",
 				dataType : "json",
@@ -111,7 +113,7 @@
 					$("#btnSubmit").remove();
 		         },
 				success : function(data) {
-					console.log(data);
+					//console.log(data);
 					if(data[0] == 1){
 						showTip("修改成功!","",2000,500);
 					}
@@ -144,12 +146,12 @@
 		<div class="control-group" style="margin-left: 12%">
 			<h5>控制器配置</h5><br>
 			<label>所在区域：</label>
-			<select id="selectArea" class="input-medium">
-				<option value="">--请选择--</option>
-				<option value="saab">区域1</option>
-				<!-- <option value="opel">区域2</option>
-				<option value="audi">区域2</option>
-				<option value="saab">区域2</option> -->
+			<select id="fZoneid" class="input-medium">
+				<option value="111">--请选择--</option>
+				<!-- <option value="saab">区域1</option> -->
+				<c:forEach items="${fns:getDictList('entrance_area')}" var="item">
+					<option value="${item.value }">${item }</option>
+				</c:forEach>
 			</select>
 		</div>
 		<div id="two_way_list_selector_a" class="two_way_list_selector margin_top_10">

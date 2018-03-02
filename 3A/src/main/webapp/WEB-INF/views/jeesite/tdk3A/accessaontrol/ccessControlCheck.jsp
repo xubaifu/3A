@@ -22,7 +22,7 @@
 				success : function(data) {
 					$("#contentTable tbody").children().remove();
 					$("#pagination").children().remove();
-					console.log(data[0].list);
+					//console.log(data[0].list);
 					var html = '';
 					for(var i = 0;i<data[0].list.length;i++){
 						//var name = data[0].list[i].name.split(",");
@@ -67,8 +67,9 @@
 <body>
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="${ctx}/accessaontrol/accessControl/ccessControlCheck">门禁查看</a></li>
+		<li><a href="${ctx}/accessaontrol/accessControl/ccessControlEdit">添加</a></li>
 	</ul>
-	<div><a href="${ctx}/accessaontrol/accessControl/ccessControlEdit">添加</a></div>
+	<%-- <div><a href="${ctx}/accessaontrol/accessControl/ccessControlEdit">添加</a></div> --%>
 		<input id="pageNo" name="pageNo" type="hidden" value=""/>
 		<input id="pageSize" name="pageSize" type="hidden" value=""/>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">

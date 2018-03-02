@@ -237,7 +237,14 @@ public class RoleController extends BaseController {
 		if (UserUtils.getUser().getId().equals(userId)) {
 			addMessage(redirectAttributes, "无法从角色【" + role.getName() + "】中移除用户【" + user.getName() + "】自己！");
 		}else {
-			if (user.getRoleList().size() <= 1){
+			Boolean flag = systemService.outUserInRole(role, user);
+			if (!flag) {
+				addMessage(redirectAttributes, "用户【" + user.getName() + "】从角色【" + role.getName() + "】中移除失败！");
+			}else {
+				addMessage(redirectAttributes, "用户【" + user.getName() + "】从角色【" + role.getName() + "】中移除成功！");
+			}
+			//以下代码保证每个用户至少拥有一个角色
+			/*if (user.getRoleList().size() <= 1){
 				addMessage(redirectAttributes, "用户【" + user.getName() + "】从角色【" + role.getName() + "】中移除失败！这已经是该用户的唯一角色，不能移除。");
 			}else{
 				Boolean flag = systemService.outUserInRole(role, user);
@@ -246,7 +253,7 @@ public class RoleController extends BaseController {
 				}else {
 					addMessage(redirectAttributes, "用户【" + user.getName() + "】从角色【" + role.getName() + "】中移除成功！");
 				}
-			}		
+			}*/	
 		}
 		return "redirect:" + adminPath + "/sys/role/assign?id="+role.getId();
 	}

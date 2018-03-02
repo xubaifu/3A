@@ -125,6 +125,16 @@
 			</div>
 		</div>
 		
+		<div class="control-group">
+			<label class="control-label">控制器区域:</label>
+			<div class="controls">
+				<form:select path="fZoneid">
+					<form:options items="${fns:getDictList('entrance_area')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
+			</div>
+		</div>
+		
+		
 		<div class="form-actions">
 			<shiro:hasPermission name="sys:user:edit"><input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;</shiro:hasPermission>
 			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>

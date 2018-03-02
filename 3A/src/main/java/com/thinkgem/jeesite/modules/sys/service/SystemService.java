@@ -149,7 +149,8 @@ public class SystemService extends BaseService implements InitializingBean {
 			if (user.getRoleList() != null && user.getRoleList().size() > 0){
 				userDao.insertUserRole(user);
 			}else{
-				throw new ServiceException(user.getLoginName() + "没有设置角色！");
+				//若没有相应角色则抛出异常
+				//throw new ServiceException(user.getLoginName() + "没有设置角色！");
 			}
 			// 将当前用户同步到Activiti
 			saveActivitiUser(user);

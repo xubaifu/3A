@@ -22,14 +22,14 @@
 		},500);
 		
 		//监听下拉选择框是否改变
-		$("#selectArea").on("change", function() {
+		$("#fZoneid").on("change", function() {
 			$("#selectDoor").children().remove();
 			$("#doorList").children().remove();
-			
+			var fZoneid = $("#fZoneid").val();
 			$.ajax({
 				type : "POST",
 				dataType : "json",
-				data : { },
+				data : {"fZoneid":fZoneid },
 				url : "/3A/a/accessaontrol/accessControl/getAllDoorByArea",
 				async : true,
 				beforeSend:function(XMLHttpRequest){
@@ -208,14 +208,15 @@
 			<br>
 			<h5>控制器配置</h5><br>
 			<label>所在区域：</label>
-			<select id="selectArea" class="input-medium">
-				<option value="">--请选择--</option>
-				<option value="saab">区域1</option>
-				<!-- <option value="opel">区域2</option>
-				<option value="audi">区域2</option>
-				<option value="saab">区域2</option> -->
+			<select id="fZoneid" class="input-medium">
+				<option value="111">--请选择--</option>
+				<!-- <option value="saab">区域1</option> -->
+				<c:forEach items="${fns:getDictList('entrance_area')}" var="item">
+					<option value="${item.value }">${item }</option>
+				</c:forEach>
 			</select>
 		</div>
+		
 		<br>
 		<div id="two_way_list_selector_b" class="two_way_list_selector margin_top_10">
 			<div class="select_l">

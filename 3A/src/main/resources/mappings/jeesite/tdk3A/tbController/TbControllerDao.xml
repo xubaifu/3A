@@ -66,7 +66,7 @@
 		   #{fPort},
 		   #{fNote},
 		   #{fDoornames},
-		   0,
+		   #{fZoneid},
 		   0,
 		   0,
 		   85,
@@ -93,7 +93,8 @@
 		       f_ip = #{fIp},
 		       f_port = #{fPort},
 		       f_note = #{fNote},
-		       f_doornames = #{fDoornames}
+		       f_doornames = #{fDoornames},
+		       f_zoneid = #{fZoneid}
 		       
 		 where f_controllerid = #{fControllerid}
 	</update>
